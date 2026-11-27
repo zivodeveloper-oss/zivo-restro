@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zivo Resto — Inventory, Billing & Menu</title>
+  <title>Zivo Resto — Login, Account & Terms</title>
   <style>
     :root {
       --bg: #f8fafc;
@@ -18,16 +18,19 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
     body { background: var(--bg); color: var(--text); padding: 16px; padding-bottom: 48px; }
-    .wrap { max-width: 900px; margin: 0 auto; }
+    .wrap { max-width: 920px; margin: 0 auto; }
     .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 16px; }
     .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
-    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
     h1 { font-size: 1.3rem; }
     h2 { font-size: 1.05rem; margin-bottom: 10px; }
-    .muted { color: var(--muted); font-size: 0.86rem; }
+    h3 { font-size: 0.96rem; margin-top: 12px; margin-bottom: 4px; }
+    p { font-size: 0.9rem; line-height: 1.5; margin-bottom: 8px; }
+    .muted { color: var(--muted); font-size: 0.85rem; }
     label { display: block; font-size: 0.82rem; color: var(--muted); margin-top: 10px; margin-bottom: 4px; }
     input, select {
-      width: 100%; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 0.92rem; background: #fff; color: var(--text);
+      width: 100%; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px;
+      font-size: 0.92rem; background: #fff; color: var(--text);
     }
     button {
       background: var(--primary); color: #fff; border: none; border-radius: 10px;
@@ -41,222 +44,291 @@
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.88rem; }
     th, td { text-align: left; padding: 9px 6px; border-bottom: 1px solid var(--border); }
     th { color: var(--muted); }
-    .check-row { display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: 0.88rem; }
-    .check-row input { width: auto; }
+    .check-row { display: flex; gap: 8px; align-items: flex-start; margin-top: 12px; font-size: 0.86rem; }
+    .check-row input { width: auto; margin-top: 3px; }
     .hidden { display: none; }
     .notice { margin-top: 10px; padding: 10px 12px; border-radius: 10px; background: var(--primary-soft); color: var(--primary); font-size: 0.86rem; }
+    .terms-box {
+      max-height: 260px; overflow-y: auto; border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px; background: #f8fafc; margin-top: 10px;
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <!-- HEADER -->
-    <div class="card">
-      <div class="row">
+    <!-- AUTH GATE (CREATE ACCOUNT OR LOGIN) -->
+    <section id="authCard" class="card">
+      <div class="row" style="margin-bottom: 12px;">
         <div>
           <h1>Zivo Resto</h1>
-          <div class="muted">Inventory • Quick Bill • Menu • Freemium & Pro (₹99/month)</div>
+          <div class="muted">Create an account or log in • ₹99 / month manual pass (no auto-pay)</div>
         </div>
         <div class="row">
-          <span class="pill" id="planBadge">Free Plan</span>
-          <button type="button" class="secondary sm" id="openUpgradeBtn">Upgrade ₹99</button>
+          <button type="button" class="tab-btn pill active" id="showLoginBtn">Login</button>
+          <button type="button" class="tab-btn pill" id="showSignupBtn">Create Account</button>
         </div>
       </div>
-    </div>
 
-    <!-- NAVIGATION TABS -->
-    <div class="tabs">
-      <button type="button" class="tab-btn pill active" data-tab="stock">1. Stock</button>
-      <button type="button" class="tab-btn pill" data-tab="bill">2. Quick Bill</button>
-      <button type="button" class="tab-btn pill" data-tab="menu">3. Menu</button>
-      <button type="button" class="tab-btn pill" data-tab="account">4. Account & Email</button>
-    </div>
+      <!-- LOGIN FORM -->
+      <form id="loginForm">
+        <label for="loginEmail">Email Address</label>
+        <input id="loginEmail" type="email" placeholder="you@example.com" required />
 
-    <!-- TAB 1: STOCK (NO FAKE DATA) -->
-    <section id="tab-stock" class="card">
-      <h2>Add Stock Item</h2>
-      <form id="stockForm">
-        <div class="grid-2">
-          <div>
-            <label for="itemName">Item Name</label>
-            <input id="itemName" type="text" placeholder="e.g., Potato, Onion, Atta" required />
-          </div>
-          <div>
-            <label for="itemQty">Quantity Left</label>
-            <input id="itemQty" type="number" step="0.01" min="0" value="0" required />
-          </div>
-          <div>
-            <label for="itemUnit">Unit</label>
-            <select id="itemUnit">
-              <option value="kg">kg</option>
-              <option value="g">g</option>
-              <option value="L">L</option>
-              <option value="pcs">pcs</option>
-            </select>
-          </div>
-          <div>
-            <label for="itemWarn">Low Stock Warning At</label>
-            <input id="itemWarn" type="number" step="0.01" min="0" value="0" required />
-          </div>
+        <label for="loginPass">Password</label>
+        <input id="loginPass" type="password" placeholder="Enter your password" required />
+
+        <div style="margin-top: 14px;">
+          <button type="submit">Log In</button>
         </div>
-        <div style="margin-top: 12px;">
-          <button type="submit">Save Stock Item</button>
-        </div>
+        <div id="authMsg" class="notice hidden"></div>
       </form>
 
-      <div class="row" style="margin-top: 20px;">
-        <h2>Stock List (<span id="stockCount">0</span>)</h2>
-        <div class="row">
-          <button type="button" class="secondary sm" id="filterLowBtn">Show Low Stock Items</button>
-          <button type="button" class="secondary sm" id="filterAllBtn">Show All</button>
-        </div>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Item</th>
-            <th>Left</th>
-            <th>Status</th>
-            <th>Adjust</th>
-          </tr>
-        </thead>
-        <tbody id="stockTableBody"></tbody>
-      </table>
-    </section>
-
-    <!-- TAB 2: QUICK BILL (FREEMIUM LIMIT ON FREE PLAN, UNLIMITED ON PRO ₹99) -->
-    <section id="tab-bill" class="card hidden">
-      <h2>Quick Bill</h2>
-      <p class="muted" id="billLimitNote">Free Plan: up to 10 saved bills. Upgrade to Zivo Pro (₹99/month) for unlimited bills.</p>
-      <form id="billForm">
+      <!-- SIGNUP FORM -->
+      <form id="signupForm" class="hidden">
         <div class="grid-2">
           <div>
-            <label for="billItem">Dish / Item</label>
-            <input id="billItem" type="text" placeholder="e.g., Masala Dosa" required />
+            <label for="signupName">Your Name / Restaurant Name</label>
+            <input id="signupName" type="text" placeholder="e.g., Zivo Kitchen" required />
           </div>
           <div>
-            <label for="billAmount">Amount (₹)</label>
-            <input id="billAmount" type="number" min="1" step="0.01" placeholder="0" required />
+            <label for="signupEmail">Email Address</label>
+            <input id="signupEmail" type="email" placeholder="you@example.com" required />
           </div>
         </div>
-        <div style="margin-top: 12px;">
-          <button type="submit">Add Bill Entry</button>
-        </div>
-      </form>
 
-      <div style="margin-top: 16px;">
-        <strong>Recorded Bills Total: ₹<span id="billTotal">0.00</span></strong>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Item</th>
-            <th>Amount (₹)</th>
-            <th>Delete</th>
-          </tr>
-        </thead>
-        <tbody id="billsTableBody"></tbody>
-      </table>
-    </section>
+        <label for="signupPass">Password (minimum 6 characters)</label>
+        <input id="signupPass" type="password" minlength="6" placeholder="Create a password" required />
 
-    <!-- TAB 3: MENU -->
-    <section id="tab-menu" class="card hidden">
-      <h2>Menu Items</h2>
-      <form id="menuForm">
-        <div class="grid-2">
-          <div>
-            <label for="menuDish">Dish Name</label>
-            <input id="menuDish" type="text" placeholder="e.g., Paneer Tikka" required />
-          </div>
-          <div>
-            <label for="menuPrice">Price (₹)</label>
-            <input id="menuPrice" type="number" min="0" step="0.01" placeholder="0" required />
-          </div>
-        </div>
-        <div style="margin-top: 12px;">
-          <button type="submit">Add to Menu</button>
-        </div>
-      </form>
-      <table>
-        <thead>
-          <tr>
-            <th>Dish</th>
-            <th>Price (₹)</th>
-            <th>Remove</th>
-          </tr>
-        </thead>
-        <tbody id="menuTableBody"></tbody>
-      </table>
-    </section>
-
-    <!-- TAB 4: ACCOUNT & PROMOTIONAL EMAIL OPT-IN -->
-    <section id="tab-account" class="card hidden">
-      <h2>Account & Email Preferences</h2>
-      <p class="muted">Syncs your profile and promotional email opt-in status with the Admin Panel.</p>
-      <form id="accountForm">
-        <div class="grid-2">
-          <div>
-            <label for="accName">Your Name / Restaurant</label>
-            <input id="accName" type="text" placeholder="Enter your name" required />
-          </div>
-          <div>
-            <label for="accEmail">Email Address</label>
-            <input id="accEmail" type="email" placeholder="name@example.com" required />
-          </div>
-        </div>
         <label class="check-row">
-          <input id="accPromoOptIn" type="checkbox" />
-          <span>I want to receive promotional emails from Zivo (can be turned off anytime)</span>
+          <input id="signupPromo" type="checkbox" />
+          <span>Optional: Send me promotional emails about Zivo features (you can turn this off anytime).</span>
         </label>
-        <div style="margin-top: 12px;">
-          <button type="submit">Save Preferences</button>
+
+        <label class="check-row">
+          <input id="signupTerms" type="checkbox" required />
+          <span>I agree to the Zivo Resto Terms & Conditions (manual ₹99/month pass, no auto-pay).</span>
+        </label>
+
+        <div style="margin-top: 14px;">
+          <button type="submit">Create Account</button>
         </div>
       </form>
-      <div id="accMsg" class="notice hidden"></div>
+
+      <!-- READABLE TERMS & CONDITIONS INSIDE AUTH -->
+      <div class="terms-box">
+        <strong>Zivo Resto — Terms & Conditions</strong>
+        <h3>1. Scope of Service</h3>
+        <p>Zivo Resto provides restaurant stock tracking, quick billing records, and menu item lists. You are responsible for verifying all quantities, prices, and tax calculations before sharing bills or menus with customers.</p>
+        <h3>2. Free Plan & ₹99 Monthly Pass (No Auto-Pay)</h3>
+        <p>The Free Plan allows up to 10 saved quick bills. The ₹99 / month pass is a manual one-time payment for a 30-day pass and does not enroll you in automatic recurring billing unless you choose a subscription elsewhere.</p>
+        <h3>3. Account & Data Responsibility</h3>
+        <p>Keep your login details accurate and secure. Data stored in your browser or connected database is managed under your account settings, and you may update your promotional email preference at any time.</p>
+        <h3>4. Acceptable Use</h3>
+        <p>Do not use Zivo Resto for unlawful activities, fraudulent billing, or automated abuse of the service.</p>
+      </div>
     </section>
 
-    <!-- FREEMIUM VS PRO (₹99 DODO PAY) CARD -->
-    <section id="upgradeBox" class="card hidden">
-      <div class="row">
-        <h2>Free Plan vs. Zivo Pro — ₹99 / month</h2>
-        <button type="button" class="secondary sm" id="closeUpgradeBtn">Close</button>
-      </div>
-      <div class="grid-2" style="margin-top: 10px;">
-        <div style="border: 1px solid var(--border); border-radius: 12px; padding: 14px;">
-          <strong>Free Plan (₹0)</strong>
-          <p class="muted" style="margin-top:6px;">Stock tracker, menu list, and up to 10 quick bills.</p>
-        </div>
-        <div style="border: 1px solid #93c5fd; background: var(--primary-soft); border-radius: 12px; padding: 14px;">
-          <strong>Zivo Pro (₹99 / month via Dodo Payments)</strong>
-          <p class="muted" style="margin-top:6px;">Unlimited quick bills and Pro badge enabled for your account.</p>
-          <div style="margin-top: 10px;">
-            <label for="dodoCheckoutUrl" style="margin-top:0;">Dodo Payments ₹99 Checkout Link</label>
-            <input id="dodoCheckoutUrl" type="url" value="https://checkout.dodopayments.com/buy/pdt_your_99_inr_plan" />
+    <!-- MAIN APP AFTER LOGIN -->
+    <div id="appShell" class="hidden">
+      <div class="card">
+        <div class="row">
+          <div>
+            <h1>Zivo Resto</h1>
+            <div class="muted">Signed in as <strong id="activeUserLabel"></strong></div>
           </div>
-          <div class="row" style="margin-top: 12px;">
-            <a id="dodoPayLink" href="https://checkout.dodopayments.com/buy/pdt_your_99_inr_plan" target="_blank" rel="noopener noreferrer">
-              <button type="button">Pay ₹99 on Dodo Pay</button>
-            </a>
-            <button type="button" class="secondary sm" id="activateProBtn">Mark Pro Active (After Payment)</button>
+          <div class="row">
+            <span class="pill" id="planBadge">Free Plan</span>
+            <button type="button" class="secondary sm" id="openUpgradeBtn">₹99 Pass</button>
+            <button type="button" class="secondary sm" id="logoutBtn">Log Out</button>
           </div>
         </div>
       </div>
-    </section>
+
+      <div class="tabs">
+        <button type="button" class="tab-btn pill active" data-tab="stock">1. Stock</button>
+        <button type="button" class="tab-btn pill" data-tab="bill">2. Quick Bill</button>
+        <button type="button" class="tab-btn pill" data-tab="menu">3. Menu</button>
+        <button type="button" class="tab-btn pill" data-tab="settings">4. Settings & Terms</button>
+      </div>
+
+      <!-- STOCK -->
+      <section id="tab-stock" class="card">
+        <h2>Add Stock Item</h2>
+        <form id="stockForm">
+          <div class="grid-2">
+            <div>
+              <label for="itemName">Item Name</label>
+              <input id="itemName" type="text" placeholder="e.g., Potato, Onion, Atta" required />
+            </div>
+            <div>
+              <label for="itemQty">Quantity Left</label>
+              <input id="itemQty" type="number" step="0.01" min="0" value="0" required />
+            </div>
+            <div>
+              <label for="itemUnit">Unit</label>
+              <select id="itemUnit">
+                <option value="kg">kg</option>
+                <option value="g">g</option>
+                <option value="L">L</option>
+                <option value="pcs">pcs</option>
+              </select>
+            </div>
+            <div>
+              <label for="itemWarn">Low Stock Warning At</label>
+              <input id="itemWarn" type="number" step="0.01" min="0" value="0" required />
+            </div>
+          </div>
+          <div style="margin-top: 12px;">
+            <button type="submit">Save Stock Item</button>
+          </div>
+        </form>
+
+        <div class="row" style="margin-top: 20px;">
+          <h2>Stock List (<span id="stockCount">0</span>)</h2>
+          <div class="row">
+            <button type="button" class="secondary sm" id="filterLowBtn">Show Low Stock Items</button>
+            <button type="button" class="secondary sm" id="filterAllBtn">Show All</button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Left</th>
+              <th>Status</th>
+              <th>Adjust</th>
+            </tr>
+          </thead>
+          <tbody id="stockTableBody"></tbody>
+        </table>
+      </section>
+
+      <!-- QUICK BILL -->
+      <section id="tab-bill" class="card hidden">
+        <h2>Quick Bill</h2>
+        <p class="muted" id="billLimitNote">Free Plan: up to 10 saved bills. ₹99 / month manual pass unlocks unlimited bills for 30 days.</p>
+        <form id="billForm">
+          <div class="grid-2">
+            <div>
+              <label for="billItem">Dish / Item</label>
+              <input id="billItem" type="text" placeholder="e.g., Masala Dosa" required />
+            </div>
+            <div>
+              <label for="billAmount">Amount (₹)</label>
+              <input id="billAmount" type="number" min="1" step="0.01" placeholder="0" required />
+            </div>
+          </div>
+          <div style="margin-top: 12px;">
+            <button type="submit">Add Bill Entry</button>
+          </div>
+        </form>
+
+        <div style="margin-top: 16px;">
+          <strong>Recorded Bills Total: ₹<span id="billTotal">0.00</span></strong>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Amount (₹)</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody id="billsTableBody"></tbody>
+        </table>
+      </section>
+
+      <!-- MENU -->
+      <section id="tab-menu" class="card hidden">
+        <h2>Menu Items</h2>
+        <form id="menuForm">
+          <div class="grid-2">
+            <div>
+              <label for="menuDish">Dish Name</label>
+              <input id="menuDish" type="text" placeholder="e.g., Paneer Tikka" required />
+            </div>
+            <div>
+              <label for="menuPrice">Price (₹)</label>
+              <input id="menuPrice" type="number" min="0" step="0.01" placeholder="0" required />
+            </div>
+          </div>
+          <div style="margin-top: 12px;">
+            <button type="submit">Add to Menu</button>
+          </div>
+        </form>
+        <table>
+          <thead>
+            <tr>
+              <th>Dish</th>
+              <th>Price (₹)</th>
+              <th>Remove</th>
+            </tr>
+          </thead>
+          <tbody id="menuTableBody"></tbody>
+        </table>
+      </section>
+
+      <!-- SETTINGS & TERMS -->
+      <section id="tab-settings" class="card hidden">
+        <h2>Email & Account Settings</h2>
+        <form id="settingsForm">
+          <label for="setName">Display Name</label>
+          <input id="setName" type="text" required />
+
+          <label class="check-row">
+            <input id="setPromo" type="checkbox" />
+            <span>Receive promotional emails from Zivo</span>
+          </label>
+
+          <div style="margin-top: 12px;">
+            <button type="submit">Save Settings</button>
+          </div>
+        </form>
+        <div id="settingsMsg" class="notice hidden"></div>
+
+        <h2 style="margin-top: 22px;">Terms & Conditions</h2>
+        <div class="terms-box">
+          <h3>1. Service Usage</h3>
+          <p>Use Zivo Resto responsibly for managing stock, billing entries, and restaurant menus.</p>
+          <h3>2. ₹99 / Month Manual Pass (No Auto-Pay)</h3>
+          <p>The ₹99 pass is purchased manually via Dodo Payments for a 30-day period and does not auto-renew in the background.</p>
+          <h3>3. Email Opt-In & Unsubscribe</h3>
+          <p>You control promotional email permission using the checkbox above.</p>
+        </div>
+      </section>
+
+      <!-- ₹99 PASS (NO AUTO-PAY) -->
+      <section id="upgradeBox" class="card hidden">
+        <div class="row">
+          <h2>Zivo ₹99 / Month Pass (No Auto-Pay)</h2>
+          <button type="button" class="secondary sm" id="closeUpgradeBtn">Close</button>
+        </div>
+        <p class="muted" style="margin-top: 6px;">Set up a <strong>One-Time Payment</strong> product for <strong>₹99</strong> in Dodo Payments so customers pay manually with zero auto-pay.</p>
+        <label for="dodoLinkInput">Dodo Payments ₹99 One-Time Checkout URL</label>
+        <input id="dodoLinkInput" type="url" value="https://checkout.dodopayments.com/buy/pdt_your_one_time_99_product" />
+        <div class="row" style="margin-top: 12px;">
+          <a id="dodoPayAnchor" href="https://checkout.dodopayments.com/buy/pdt_your_one_time_99_product" target="_blank" rel="noopener noreferrer">
+            <button type="button">Open ₹99 Payment Link</button>
+          </a>
+          <button type="button" class="secondary sm" id="activatePassBtn">Activate 30-Day Pass</button>
+        </div>
+        <div id="passMsg" class="notice hidden"></div>
+      </section>
+    </div>
   </div>
 
   <script>
     const KEYS = {
-      apps: "zivo_eco_apps_v1",
       users: "zivo_eco_users_v1",
-      gaId: "zivo_eco_ga_id_v1",
+      session: "zivo_resto_session_email_v1",
       stock: "zivo_resto_stock_v1",
       bills: "zivo_resto_bills_v1",
-      menu: "zivo_resto_menu_v1",
-      currentUser: "zivo_resto_current_user_v1"
+      menu: "zivo_resto_menu_v1"
     };
 
     const $ = (id) => document.getElementById(id);
 
-    function readList(key) {
+    function readArr(key) {
       try {
         const v = JSON.parse(localStorage.getItem(key));
         return Array.isArray(v) ? v : [];
@@ -265,94 +337,169 @@
       }
     }
 
-    function writeList(key, v) {
-      localStorage.setItem(key, JSON.stringify(v));
+    function writeArr(key, val) {
+      localStorage.setItem(key, JSON.stringify(val));
     }
 
-    function getCurrentUser() {
-      try {
-        return JSON.parse(localStorage.getItem(KEYS.currentUser)) || {
-          name: "",
-          email: "",
-          promoOptIn: false,
-          plan: "free"
-        };
-      } catch {
-        return { name: "", email: "", promoOptIn: false, plan: "free" };
+    async function hashPass(password) {
+      const data = new TextEncoder().encode(password);
+      const digest = await crypto.subtle.digest("SHA-256", data);
+      return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    function getActiveUser() {
+      const email = localStorage.getItem(KEYS.session);
+      if (!email) return null;
+      return readArr(KEYS.users).find((u) => u.email === email) || null;
+    }
+
+    function upsertUser(updatedUser) {
+      const users = readArr(KEYS.users);
+      const idx = users.findIndex((u) => u.email === updatedUser.email);
+      if (idx >= 0) users[idx] = updatedUser;
+      else users.push(updatedUser);
+      writeArr(KEYS.users, users);
+    }
+
+    function hasActivePass(user) {
+      if (!user || !user.passUntil) return false;
+      return Date.now() < Number(user.passUntil);
+    }
+
+    function showAuthMsg(text) {
+      $("authMsg").textContent = text;
+      $("authMsg").classList.remove("hidden");
+    }
+
+    // Auth toggle
+    $("showLoginBtn").addEventListener("click", () => {
+      $("showLoginBtn").classList.add("active");
+      $("showSignupBtn").classList.remove("active");
+      $("loginForm").classList.remove("hidden");
+      $("signupForm").classList.add("hidden");
+      $("authMsg").classList.add("hidden");
+    });
+
+    $("showSignupBtn").addEventListener("click", () => {
+      $("showSignupBtn").classList.add("active");
+      $("showLoginBtn").classList.remove("active");
+      $("signupForm").classList.remove("hidden");
+      $("loginForm").classList.add("hidden");
+      $("authMsg").classList.add("hidden");
+    });
+
+    // Create account
+    $("signupForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = $("signupName").value.trim();
+      const email = $("signupEmail").value.trim().toLowerCase();
+      const pass = $("signupPass").value;
+      const promoOptIn = $("signupPromo").checked;
+
+      const users = readArr(KEYS.users);
+      if (users.some((u) => u.email === email)) {
+        showAuthMsg("An account with that email already exists. Switch to Login.");
+        return;
       }
-    }
 
-    function saveCurrentUser(user) {
-      localStorage.setItem(KEYS.currentUser, JSON.stringify(user));
-      if (user.email) {
-        const users = readList(KEYS.users);
-        const idx = users.findIndex((u) => u.email === user.email);
-        const record = {
-          name: user.name,
-          email: user.email,
-          appName: "Zivo Resto",
-          plan: user.plan || "free",
-          promoOptIn: Boolean(user.promoOptIn)
-        };
-        if (idx >= 0) users[idx] = record;
-        else users.push(record);
-        writeList(KEYS.users, users);
+      const passHash = await hashPass(pass);
+      const newUser = {
+        name,
+        email,
+        passHash,
+        appName: "Zivo Resto",
+        promoOptIn,
+        plan: "free",
+        passUntil: 0
+      };
+      upsertUser(newUser);
+      localStorage.setItem(KEYS.session, email);
+      $("signupForm").reset();
+      enterApp();
+    });
+
+    // Login
+    $("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = $("loginEmail").value.trim().toLowerCase();
+      const pass = $("loginPass").value;
+      const passHash = await hashPass(pass);
+
+      const user = readArr(KEYS.users).find((u) => u.email === email);
+      if (!user || !user.passHash || user.passHash !== passHash) {
+        showAuthMsg("Email or password does not match.");
+        return;
       }
-    }
 
-    // Load GA4 if configured in Admin Panel
-    const gaMeasurementId = localStorage.getItem(KEYS.gaId);
-    if (gaMeasurementId) {
-      const s = document.createElement("script");
-      s.async = true;
-      s.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(gaMeasurementId)}`;
-      document.head.appendChild(s);
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){ window.dataLayer.push(arguments); }
-      gtag("js", new Date());
-      gtag("config", gaMeasurementId);
+      localStorage.setItem(KEYS.session, email);
+      $("loginForm").reset();
+      $("authMsg").classList.add("hidden");
+      enterApp();
+    });
+
+    $("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem(KEYS.session);
+      $("appShell").classList.add("hidden");
+      $("authCard").classList.remove("hidden");
+    });
+
+    function enterApp() {
+      const user = getActiveUser();
+      if (!user) return;
+      $("authCard").classList.add("hidden");
+      $("appShell").classList.remove("hidden");
+      $("activeUserLabel").textContent = `${user.name} (${user.email})`;
+      $("setName").value = user.name;
+      $("setPromo").checked = Boolean(user.promoOptIn);
+      renderPlan();
+      renderStock();
+      renderBills();
+      renderMenu();
     }
 
     // Tabs
-    document.querySelectorAll(".tab-btn").forEach((btn) => {
+    document.querySelectorAll(".tab-btn[data-tab]").forEach((btn) => {
       btn.addEventListener("click", () => {
-        document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+        document.querySelectorAll(".tab-btn[data-tab]").forEach((b) => b.classList.remove("active"));
         btn.classList.add("active");
         const target = btn.dataset.tab;
-        ["stock", "bill", "menu", "account"].forEach((t) => {
+        ["stock", "bill", "menu", "settings"].forEach((t) => {
           $("tab-" + t).classList.toggle("hidden", t !== target);
         });
       });
     });
 
-    // Upgrade panel
+    // ₹99 manual pass (30 days, no auto-pay)
     $("openUpgradeBtn").addEventListener("click", () => $("upgradeBox").classList.remove("hidden"));
     $("closeUpgradeBtn").addEventListener("click", () => $("upgradeBox").classList.add("hidden"));
-    $("dodoCheckoutUrl").addEventListener("input", (e) => {
-      $("dodoPayLink").href = e.target.value.trim() || "#";
+    $("dodoLinkInput").addEventListener("input", (e) => {
+      $("dodoPayAnchor").href = e.target.value.trim() || "#";
     });
-    $("activateProBtn").addEventListener("click", () => {
-      const user = getCurrentUser();
+    $("activatePassBtn").addEventListener("click", () => {
+      const user = getActiveUser();
+      if (!user) return;
       user.plan = "pro";
-      saveCurrentUser(user);
+      user.passUntil = Date.now() + 30 * 24 * 60 * 60 * 1000;
+      upsertUser(user);
       renderPlan();
-      $("upgradeBox").classList.add("hidden");
+      $("passMsg").textContent = "30-day ₹99 pass activated (no auto-pay).";
+      $("passMsg").classList.remove("hidden");
     });
 
     function renderPlan() {
-      const user = getCurrentUser();
-      const isPro = user.plan === "pro";
-      $("planBadge").textContent = isPro ? "Pro Plan (₹99)" : "Free Plan";
-      $("billLimitNote").textContent = isPro
-        ? "Zivo Pro active: unlimited quick bills enabled."
-        : "Free Plan: up to 10 saved bills. Upgrade to Zivo Pro (₹99/month) for unlimited bills.";
+      const user = getActiveUser();
+      const active = hasActivePass(user);
+      $("planBadge").textContent = active ? "₹99 Pass Active" : "Free Plan";
+      $("billLimitNote").textContent = active
+        ? "₹99 Pass active for 30 days (no auto-pay): unlimited quick bills enabled."
+        : "Free Plan: up to 10 saved bills. ₹99 / month manual pass unlocks unlimited bills for 30 days.";
     }
 
-    // Stock logic
+    // Stock
     let lowOnly = false;
     $("stockForm").addEventListener("submit", (e) => {
       e.preventDefault();
-      const stock = readList(KEYS.stock);
+      const stock = readArr(KEYS.stock);
       stock.push({
         id: "st_" + Date.now(),
         name: $("itemName").value.trim(),
@@ -360,7 +507,7 @@
         unit: $("itemUnit").value,
         warnAt: Number($("itemWarn").value)
       });
-      writeList(KEYS.stock, stock);
+      writeArr(KEYS.stock, stock);
       $("stockForm").reset();
       $("itemQty").value = "0";
       $("itemWarn").value = "0";
@@ -371,21 +518,19 @@
     $("filterAllBtn").addEventListener("click", () => { lowOnly = false; renderStock(); });
 
     function adjustStock(id, delta) {
-      const stock = readList(KEYS.stock).map((item) => {
+      const next = readArr(KEYS.stock).map((item) => {
         if (item.id !== id) return item;
-        const nextQty = Math.max(0, Number((item.qty + delta).toFixed(2)));
-        return { ...item, qty: nextQty };
+        return { ...item, qty: Math.max(0, Number((item.qty + delta).toFixed(2))) };
       });
-      writeList(KEYS.stock, stock);
+      writeArr(KEYS.stock, next);
       renderStock();
     }
 
     function renderStock() {
-      const stock = readList(KEYS.stock);
+      const stock = readArr(KEYS.stock);
       $("stockCount").textContent = String(stock.length);
       const list = lowOnly ? stock.filter((i) => i.qty <= i.warnAt) : stock;
-      const body = $("stockTableBody");
-      body.innerHTML = list.length
+      $("stockTableBody").innerHTML = list.length
         ? list.map((i) => {
             const isLow = i.qty <= i.warnAt;
             return `
@@ -402,15 +547,15 @@
               </tr>
             `;
           }).join("")
-        : `<tr><td colspan="4" class="muted">No stock items recorded yet.</td></tr>`;
+        : `<tr><td colspan="4" class="muted">No stock items added yet.</td></tr>`;
     }
 
-    // Bills logic
+    // Bills
     $("billForm").addEventListener("submit", (e) => {
       e.preventDefault();
-      const user = getCurrentUser();
-      const bills = readList(KEYS.bills);
-      if (user.plan !== "pro" && bills.length >= 10) {
+      const user = getActiveUser();
+      const bills = readArr(KEYS.bills);
+      if (!hasActivePass(user) && bills.length >= 10) {
         $("upgradeBox").classList.remove("hidden");
         return;
       }
@@ -419,22 +564,21 @@
         item: $("billItem").value.trim(),
         amount: Number($("billAmount").value)
       });
-      writeList(KEYS.bills, bills);
+      writeArr(KEYS.bills, bills);
       $("billForm").reset();
       renderBills();
     });
 
     function deleteBill(id) {
-      writeList(KEYS.bills, readList(KEYS.bills).filter((b) => b.id !== id));
+      writeArr(KEYS.bills, readArr(KEYS.bills).filter((b) => b.id !== id));
       renderBills();
     }
 
     function renderBills() {
-      const bills = readList(KEYS.bills);
+      const bills = readArr(KEYS.bills);
       const total = bills.reduce((sum, b) => sum + Number(b.amount || 0), 0);
       $("billTotal").textContent = total.toFixed(2);
-      const body = $("billsTableBody");
-      body.innerHTML = bills.length
+      $("billsTableBody").innerHTML = bills.length
         ? bills.map((b) => `
             <tr>
               <td>${esc(b.item)}</td>
@@ -445,29 +589,28 @@
         : `<tr><td colspan="3" class="muted">No bills added yet.</td></tr>`;
     }
 
-    // Menu logic
+    // Menu
     $("menuForm").addEventListener("submit", (e) => {
       e.preventDefault();
-      const menu = readList(KEYS.menu);
+      const menu = readArr(KEYS.menu);
       menu.push({
         id: "mn_" + Date.now(),
         dish: $("menuDish").value.trim(),
         price: Number($("menuPrice").value)
       });
-      writeList(KEYS.menu, menu);
+      writeArr(KEYS.menu, menu);
       $("menuForm").reset();
       renderMenu();
     });
 
     function deleteMenuItem(id) {
-      writeList(KEYS.menu, readList(KEYS.menu).filter((m) => m.id !== id));
+      writeArr(KEYS.menu, readArr(KEYS.menu).filter((m) => m.id !== id));
       renderMenu();
     }
 
     function renderMenu() {
-      const menu = readList(KEYS.menu);
-      const body = $("menuTableBody");
-      body.innerHTML = menu.length
+      const menu = readArr(KEYS.menu);
+      $("menuTableBody").innerHTML = menu.length
         ? menu.map((m) => `
             <tr>
               <td>${esc(m.dish)}</td>
@@ -478,24 +621,17 @@
         : `<tr><td colspan="3" class="muted">No menu items added yet.</td></tr>`;
     }
 
-    // Account & Email Opt-In
-    const initUser = getCurrentUser();
-    $("accName").value = initUser.name || "";
-    $("accEmail").value = initUser.email || "";
-    $("accPromoOptIn").checked = Boolean(initUser.promoOptIn);
-
-    $("accountForm").addEventListener("submit", (e) => {
+    // Settings
+    $("settingsForm").addEventListener("submit", (e) => {
       e.preventDefault();
-      const current = getCurrentUser();
-      const updated = {
-        ...current,
-        name: $("accName").value.trim(),
-        email: $("accEmail").value.trim(),
-        promoOptIn: $("accPromoOptIn").checked
-      };
-      saveCurrentUser(updated);
-      $("accMsg").textContent = "Saved preferences.";
-      $("accMsg").classList.remove("hidden");
+      const user = getActiveUser();
+      if (!user) return;
+      user.name = $("setName").value.trim();
+      user.promoOptIn = $("setPromo").checked;
+      upsertUser(user);
+      $("activeUserLabel").textContent = `${user.name} (${user.email})`;
+      $("settingsMsg").textContent = "Settings saved.";
+      $("settingsMsg").classList.remove("hidden");
     });
 
     function esc(s) {
@@ -504,10 +640,9 @@
       }[c]));
     }
 
-    renderPlan();
-    renderStock();
-    renderBills();
-    renderMenu();
+    if (getActiveUser()) {
+      enterApp();
+    }
   </script>
 </body>
 </html>
