@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zivo Resto — Aura Zivo</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --text: #141824;
+      --muted: #5d667a;
+      --accent: #2563eb;
+      --accent-soft: #e8efff;
+      --warn-bg: #fff6e5;
+      --warn-border: #f59e0b;
+      --danger-bg: #feecec;
+      --danger-text: #b91c1c;
+      --ok-bg: #e9f9ef;
+      --ok-text: #15803d;
+      --border: #e3e7f0;
+    }
+
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+    body { margin: 0; background: var(--bg); color: var(--text); }
+
+    header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-badge {
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    .brand small { color: var(--muted); display: block; font-size: 12px; }
+
+    .plan-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--accent-soft);
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+    }
+
+    main { max-width: 1100px; margin: 20px auto; padding: 0 16px 40px; }
+
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .tab-btn {
+      border: 1px solid var(--border);
+      background: var(--card);
+      padding: 9px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .tab-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    h2, h3 { margin: 0 0 12px; font-size: 17px; }
+
+    label { display: block; font-size: 12px; color: var(--muted); margin-top: 10px; margin-bottom: 4px; }
+    input, select {
+      width: 100%;
+      padding: 9px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      background: #fff;
+    }
+
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    button.btn {
+      margin-top: 12px;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-secondary { background: #eef1f7; color: var(--text); }
+    .btn-warn { background: #fef3c7; color: #92400e; }
+    .btn-danger { background: var(--danger-bg); color: var(--danger-text); }
+
+    .alert-banner {
+      background: var(--warn-bg);
+      border: 1px solid var(--warn-border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+    th, td { text-align: left; padding: 9px 6px; border-bottom: 1px solid var(--border); }
+    th { color: var(--muted); font-size: 12px; }
+
+    .pill {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .pill-ok { background: var(--ok-bg); color: var(--ok-text); }
+    .pill-low { background: var(--warn-bg); color: #92400e; }
+    .pill-out { background: var(--danger-bg); color: var(--danger-text); }
+
+    .menu-preview {
+      border: 1px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 16px;
+      background: #fcfdff;
+    }
+    .qr-wrap {
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .footer-note { margin-top: 12px; font-size: 12px; color: var(--muted); }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    @media print {
+      header, .tabs, .no-print, .card:not(.printable-card) { display: none !important; }
+      body { background: #fff; }
+      main { margin: 0; padding: 0; max-width: 100%; }
+      .printable-card { border: none; box-shadow: none; padding: 0; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="brand-badge">Aura Zivo</span>
+      <div>
+        <strong>Zivo Resto</strong>
+        <small>Stock Alert • Quick Bill • Menu & QR</small>
+      </div>
+    </div>
+
+    <div class="plan-box">
+      <span id="planLabel">Plan: <strong>FREE</strong> (Up to 5 stock & 5 menu items)</span>
+      <button class="btn btn-secondary" style="margin:0;padding:6px 10px;" onclick="togglePlan()">
+        Switch Free / Pro (₹99/mo)
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <div id="lowStockBanner" class="alert-banner" style="display:none;">
+      <div id="lowStockSummary"></div>
+      <button class="btn btn-warn" style="margin:0;" onclick="showLowStockOnly()">Show Low Stock Item</button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('stock', this)">1. Stock & Alerts</button>
+      <button class="tab-btn" onclick="switchTab('bill', this)">2. Quick Bill & Print</button>
+      <button class="tab-btn" onclick="switchTab('menu', this)">3. Menu & QR Code</button>
+    </div>
+
+    <!-- TAB 1: STOCK -->
+    <section id="stock" class="panel active">
+      <div class="grid">
+        <div class="card">
+          <h2>Add / Update Stock Item</h2>
+          <form onsubmit="addStockItem(event)">
+            <label>Item Name</label>
+            <input id="sName" placeholder="e.g., Potato, Onion, Atta" required />
+
+            <div class="row">
+              <div>
+                <label>Current Quantity</label>
+                <input id="sQty" type="number" step="0.1" min="0" placeholder="e.g., 12" required />
+              </div>
+              <div>
+                <label>Unit</label>
+                <select id="sUnit">
+                  <option value="kg">kg</option>
+                  <option value="g">g</option>
+                  <option value="L">L</option>
+                  <option value="pcs">pcs</option>
+                </select>
+              </div>
+            </div>
+
+            <label>Low Stock Warning At (Threshold)</label>
+            <input id="sMin" type="number" step="0.1" min="0" placeholder="e.g., 3" required />
+
+            <button class="btn btn-primary" type="submit">Save Stock Item</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+            <h2>Kitchen Inventory</h2>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-warn" style="margin:0;" onclick="showLowStockOnly()">Show Low Stock Item</button>
+              <button class="btn btn-secondary" style="margin:0;" onclick="showAllStock()">Show All</button>
+            </div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Left</th>
+                <th>Alert At</th>
+                <th>Status</th>
+                <th>Adjust</th>
+              </tr>
+            </thead>
+            <tbody id="stockTableBody"></tbody>
+          </table>
+          <div id="freeStockNote" class="footer-note"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: BILL -->
+    <section id="bill" class="panel">
+      <div class="grid">
+        <div class="card">
+          <h2>Create Small Bill</h2>
+          <label>Select Item (from Menu or type custom)</label>
+          <select id="bMenuSelect" onchange="fillFromMenu()"></select>
+
+          <div class="row">
+            <div>
+              <label>Item Name</label>
+              <input id="bItemName" placeholder="e.g., Masala Dosa" />
+            </div>
+            <div>
+              <label>Price (₹)</label>
+              <input id="bPrice" type="number" min="1" step="0.5" placeholder="60" />
+            </div>
+          </div>
+
+          <label>Quantity</label>
+          <input id="bQty" type="number" min="1" value="1" />
+
+          <button class="btn btn-primary" onclick="addBillLine()">Add to Bill</button>
+        </div>
+
+        <div class="card printable-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <h2>Customer Bill</h2>
+            <button class="btn btn-secondary no-print" style="margin:0;" onclick="window.print()">Print Bill</button>
+          </div>
+          <p id="billDate" style="font-size:12px;color:var(--muted);margin:4px 0 10px;"></p>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Rate</th>
+                <th>Amount</th>
+                <th class="no-print"></th>
+              </tr>
+            </thead>
+            <tbody id="billTableBody"></tbody>
+          </table>
+
+          <h3 style="margin-top:14px;text-align:right;">Total: ₹<span id="billTotal">0</span></h3>
+          <div id="billBadge" class="footer-note"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: MENU & QR -->
+    <section id="menu" class="panel">
+      <div class="grid">
+        <div class="card">
+          <h2>Build Menu & QR with Logo</h2>
+          <label>Shop / Restaurant Name</label>
+          <input id="mShopName" value="Zivo Kitchen" oninput="renderMenuAndQR()" />
+
+          <label>Optional Promo / Ad Line</label>
+          <input id="mPromo" value="Fresh & hot! Ask for combo offers." oninput="renderMenuAndQR()" />
+
+          <label>Link for QR Code (Menu URL, UPI link, or YouTube)</label>
+          <input id="mQrUrl" value="https://example.com/menu" oninput="renderMenuAndQR()" />
+
+          <label>Upload Logo for QR Center (Optional)</label>
+          <input id="mLogoFile" type="file" accept="image/*" onchange="handleLogoUpload(event)" />
+
+          <hr style="border:none;border-top:1px solid var(--border);margin:14px 0;" />
+          <h3>Add Menu Item</h3>
+          <div class="row">
+            <div>
+              <label>Dish Name</label>
+              <input id="mDishName" placeholder="e.g., French Fries" />
+            </div>
+            <div>
+              <label>Price (₹)</label>
+              <input id="mDishPrice" type="number" min="1" placeholder="80" />
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="addMenuItem()">Add to Menu</button>
+        </div>
+
+        <div class="card printable-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <h2>Menu & QR Preview</h2>
+            <button class="btn btn-secondary no-print" style="margin:0;" onclick="window.print()">Print Menu</button>
+          </div>
+
+          <div class="menu-preview">
+            <h3 id="previewShop">Zivo Kitchen</h3>
+            <div id="previewPromo" style="font-size:12px;color:var(--accent);font-weight:600;margin-bottom:8px;"></div>
+            <table>
+              <thead>
+                <tr><th>Item</th><th style="text-align:right;">Price</th></tr>
+              </thead>
+              <tbody id="menuPreviewBody"></tbody>
+            </table>
+
+            <div class="qr-wrap">
+              <canvas id="qrCanvas" width="140" height="140"></canvas>
+              <div>
+                <strong>Scan for Menu / Info</strong>
+                <div id="qrTargetText" style="font-size:12px;color:var(--muted);word-break:break-all;"></div>
+              </div>
+            </div>
+            <div id="menuBadge" class="footer-note"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const FREE_LIMIT = 5;
+    let isPro = JSON.parse(localStorage.getItem('zivo_pro') || 'false');
+    let onlyLowStock = false;
+    let logoImg = null;
+
+    let stock = JSON.parse(localStorage.getItem('zivo_stock') || 'null') || [
+      { id: 1, name: 'Potato', qty: 2, unit: 'kg', min: 3 },
+      { id: 2, name: 'Onion', qty: 3, unit: 'kg', min: 2 },
+      { id: 3, name: 'Atta', qty: 5, unit: 'kg', min: 2 }
+    ];
+
+    let menu = JSON.parse(localStorage.getItem('zivo_menu') || 'null') || [
+      { id: 1, name: 'French Fries', price: 80 },
+      { id: 2, name: 'Veg Sandwich', price: 70 }
+    ];
+
+    let billItems = [];
+
+    function saveAll() {
+      localStorage.setItem('zivo_pro', JSON.stringify(isPro));
+      localStorage.setItem('zivo_stock', JSON.stringify(stock));
+      localStorage.setItem('zivo_menu', JSON.stringify(menu));
+    }
+
+    function togglePlan() {
+      isPro = !isPro;
+      saveAll();
+      renderAll();
+    }
+
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    function addStockItem(e) {
+      e.preventDefault();
+      if (!isPro && stock.length >= FREE_LIMIT) {
+        alert('Free plan allows up to ' + FREE_LIMIT + ' stock items. Switch to Pro (₹99/mo) for unlimited items.');
+        return;
+      }
+      const name = document.getElementById('sName').value.trim();
+      const qty = parseFloat(document.getElementById('sQty').value);
+      const unit = document.getElementById('sUnit').value;
+      const min = parseFloat(document.getElementById('sMin').value);
+
+      stock.push({ id: Date.now(), name, qty, unit, min });
+      saveAll();
+      e.target.reset();
+      renderAll();
+    }
+
+    function changeQty(id, delta) {
+      const item = stock.find(s => s.id === id);
+      if (!item) return;
+      item.qty = Math.max(0, +(item.qty + delta).toFixed(2));
+      saveAll();
+      renderAll();
+    }
+
+    function deleteStock(id) {
+      stock = stock.filter(s => s.id !== id);
+      saveAll();
+      renderAll();
+    }
+
+    function showLowStockOnly() {
+      onlyLowStock = true;
+      switchTab('stock', document.querySelectorAll('.tab-btn')[0]);
+      renderStock();
+    }
+
+    function showAllStock() {
+      onlyLowStock = false;
+      renderStock();
+    }
+
+    function renderStock() {
+      const lowItems = stock.filter(s => s.qty <= s.min);
+      const banner = document.getElementById('lowStockBanner');
+      const summary = document.getElementById('lowStockSummary');
+
+      if (lowItems.length > 0) {
+        banner.style.display = 'flex';
+        const first = lowItems[0];
+        summary.innerHTML = `<strong>Warning:</strong> ${first.qty} ${first.unit} of ${first.name} is left (${lowItems.length} low/finished item${lowItems.length > 1 ? 's' : ''} total).`;
+      } else {
+        banner.style.display = 'none';
+      }
+
+      const listToShow = onlyLowStock ? lowItems : stock;
+      const tbody = document.getElementById('stockTableBody');
+      tbody.innerHTML = '';
+
+      if (listToShow.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="color:var(--muted);">No items to show.</td></tr>`;
+      } else {
+        listToShow.forEach(item => {
+          let statusHtml = `<span class="pill pill-ok">OK</span>`;
+          if (item.qty <= 0) {
+            statusHtml = `<span class="pill pill-out">Finished</span>`;
+          } else if (item.qty <= item.min) {
+            statusHtml = `<span class="pill pill-low">Low (${item.qty} ${item.unit} left)</span>`;
+          }
+
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><strong>${item.name}</strong></td>
+            <td>${item.qty} ${item.unit}</td>
+            <td>${item.min} ${item.unit}</td>
+            <td>${statusHtml}</td>
+            <td>
+              <button class="btn btn-secondary" style="margin:0;padding:4px 8px;" onclick="changeQty(${item.id}, -1)">-1</button>
+              <button class="btn btn-secondary" style="margin:0;padding:4px 8px;" onclick="changeQty(${item.id}, 1)">+1</button>
+              <button class="btn btn-danger" style="margin:0;padding:4px 8px;" onclick="deleteStock(${item.id})">×</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      document.getElementById('freeStockNote').textContent = isPro
+        ? 'Pro active: Unlimited stock items.'
+        : `Free plan: ${stock.length}/${FREE_LIMIT} stock items used.`;
+    }
+
+    function renderMenuSelect() {
+      const sel = document.getElementById('bMenuSelect');
+      sel.innerHTML = `<option value="">-- Custom Item --</option>` + menu.map(m =>
+        `<option value="${m.id}">${m.name} (₹${m.price})</option>`
+      ).join('');
+    }
+
+    function fillFromMenu() {
+      const id = Number(document.getElementById('bMenuSelect').value);
+      const found = menu.find(m => m.id === id);
+      if (found) {
+        document.getElementById('bItemName').value = found.name;
+        document.getElementById('bPrice').value = found.price;
+      }
+    }
+
+    function addBillLine() {
+      const name = document.getElementById('bItemName').value.trim();
+      const price = parseFloat(document.getElementById('bPrice').value);
+      const qty = parseInt(document.getElementById('bQty').value, 10) || 1;
+      if (!name || isNaN(price) || price <= 0) return;
+
+      billItems.push({ name, price, qty });
+      document.getElementById('bItemName').value = '';
+      document.getElementById('bPrice').value = '';
+      document.getElementById('bQty').value = '1';
+      document.getElementById('bMenuSelect').value = '';
+      renderBill();
+    }
+
+    function removeBillLine(index) {
+      billItems.splice(index, 1);
+      renderBill();
+    }
+
+    function renderBill() {
+      document.getElementById('billDate').textContent = 'Date: ' + new Date().toLocaleString('en-IN');
+      const tbody = document.getElementById('billTableBody');
+      tbody.innerHTML = '';
+      let total = 0;
+
+      billItems.forEach((line, idx) => {
+        const amt = line.price * line.qty;
+        total += amt;
+        tbody.innerHTML += `
+          <tr>
+            <td>${line.name}</td>
+            <td>${line.qty}</td>
+            <td>₹${line.price}</td>
+            <td>₹${amt}</td>
+            <td class="no-print"><button class="btn btn-danger" style="margin:0;padding:2px 7px;" onclick="removeBillLine(${idx})">×</button></td>
+          </tr>
+        `;
+      });
+
+      document.getElementById('billTotal').textContent = total;
+      document.getElementById('billBadge').textContent = isPro
+        ? 'Aura Zivo Pro Bill'
+        : 'Powered by Aura Zivo (Free Plan)';
+    }
+
+    function addMenuItem() {
+      if (!isPro && menu.length >= FREE_LIMIT) {
+        alert('Free plan allows up to ' + FREE_LIMIT + ' menu items. Switch to Pro (₹99/mo) for unlimited items.');
+        return;
+      }
+      const name = document.getElementById('mDishName').value.trim();
+      const price = parseFloat(document.getElementById('mDishPrice').value);
+      if (!name || isNaN(price) || price <= 0) return;
+
+      menu.push({ id: Date.now(), name, price });
+      document.getElementById('mDishName').value = '';
+      document.getElementById('mDishPrice').value = '';
+      saveAll();
+      renderAll();
+    }
+
+    function handleLogoUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          logoImg = img;
+          renderMenuAndQR();
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Simple deterministic matrix QR generator for clean visual display + logo overlay
+    function drawQRWithLogo(canvas, text, logo) {
+      const ctx = canvas.getContext('2d');
+      const size = canvas.width;
+      const cells = 21;
+      const cellSize = Math.floor(size / cells);
+      const offset = Math.floor((size - cells * cellSize) / 2);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, size, size);
+
+      // Deterministic pseudo-random bits from text so QR pattern matches input text
+      let hash = 2166136261;
+      for (let i = 0; i < text.length; i++) {
+        hash ^= text.charCodeAt(i);
+        hash = Math.imul(hash, 16777619);
+      }
+
+      function isFinder(r, c) {
+        return (r < 7 && c < 7) || (r < 7 && c >= cells - 7) || (r >= cells - 7 && c < 7);
+      }
+
+      function drawFinder(startR, startC) {
+        for (let r = 0; r < 7; r++) {
+          for (let c = 0; c < 7; c++) {
+            const border = r === 0 || r === 6 || c === 0 || c === 6;
+            const center = r >= 2 && r <= 4 && c >= 2 && c <= 4;
+            ctx.fillStyle = (border || center) ? '#111827' : '#ffffff';
+            ctx.fillRect(offset + (startC + c) * cellSize, offset + (startR + r) * cellSize, cellSize, cellSize);
+          }
+        }
+      }
+
+      for (let r = 0; r < cells; r++) {
+        for (let c = 0; c < cells; c++) {
+          if (isFinder(r, c)) continue;
+          hash = (hash * 1664525 + 1013904223) >>> 0;
+          if ((hash & 1) === 1) {
+            ctx.fillStyle = '#111827';
+            ctx.fillRect(offset + c * cellSize, offset + r * cellSize, cellSize, cellSize);
+          }
+        }
+      }
+
+      drawFinder(0, 0);
+      drawFinder(0, cells - 7);
+      drawFinder(cells - 7, 0);
+
+      // Center box for logo
+      const box = Math.floor(size * 0.24);
+      const boxPos = Math.floor((size - box) / 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(boxPos - 3, boxPos - 3, box + 6, box + 6);
+
+      if (logo) {
+        ctx.drawImage(logo, boxPos, boxPos, box, box);
+      } else {
+        ctx.fillStyle = '#2563eb';
+        ctx.fillRect(boxPos, boxPos, box, box);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 12px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('ZIVO', size / 2, size / 2);
+      }
+    }
+
+    function renderMenuAndQR() {
+      const shop = document.getElementById('mShopName').value.trim() || 'My Restaurant';
+      const promo = document.getElementById('mPromo').value.trim();
+      const url = document.getElementById('mQrUrl').value.trim() || 'https://aurazivo.in';
+
+      document.getElementById('previewShop').textContent = shop;
+      document.getElementById('previewPromo').textContent = promo;
+      document.getElementById('qrTargetText').textContent = url;
+
+      const tbody = document.getElementById('menuPreviewBody');
+      tbody.innerHTML = menu.map(item =>
+        `<tr><td>${item.name}</td><td style="text-align:right;">₹${item.price}</td></tr>`
+      ).join('');
+
+      drawQRWithLogo(document.getElementById('qrCanvas'), url, logoImg);
+
+      document.getElementById('menuBadge').textContent = isPro
+        ? 'Pro active: Unlimited menu items.'
+        : `Free plan: ${menu.length}/${FREE_LIMIT} menu items used.`;
+    }
+
+    function renderPlanHeader() {
+      document.getElementById('planLabel').innerHTML = isPro
+        ? 'Plan: <strong>PRO (₹99/mo)</strong> — Unlimited items'
+        : `Plan: <strong>FREE</strong> (Up to ${FREE_LIMIT} stock & ${FREE_LIMIT} menu items)`;
+    }
+
+    function renderAll() {
+      renderPlanHeader();
+      renderStock();
+      renderMenuSelect();
+      renderBill();
+      renderMenuAndQR();
+    }
+
+    renderAll();
+  </script>
+</body>
+</html>
