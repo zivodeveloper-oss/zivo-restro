@@ -3,213 +3,398 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#2563eb" />
   <title>Zivo Resto — Aura Zivo</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <style>
     :root {
-      --bg: #f6f7fb;
-      --card: #ffffff;
-      --text: #141824;
-      --muted: #5d667a;
-      --accent: #2563eb;
-      --accent-soft: #e8efff;
-      --warn-bg: #fff6e5;
+      --bg: #f3f5f9;
+      --surface: #ffffff;
+      --surface-alt: #f8fafc;
+      --text: #0f172a;
+      --muted: #64748b;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-soft: #eff6ff;
+      --border: #e2e8f0;
+      --warn-bg: #fffbeb;
       --warn-border: #f59e0b;
-      --danger-bg: #feecec;
+      --warn-text: #92400e;
+      --danger-bg: #fef2f2;
       --danger-text: #b91c1c;
-      --ok-bg: #e9f9ef;
+      --ok-bg: #f0fdf4;
       --ok-text: #15803d;
-      --border: #e3e7f0;
+      --radius: 12px;
+      --shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
     }
 
-    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
-    body { margin: 0; background: var(--bg); color: var(--text); }
+    body.os-windows {
+      --bg: #f0f3f9;
+      --surface: #ffffff;
+      --primary: #0067c0;
+      --primary-hover: #005a9e;
+      --primary-soft: #ebf3fc;
+      --border: #d8dee9;
+      --radius: 8px;
+      --shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
 
-    header {
-      background: var(--card);
+    body.os-android {
+      --bg: #f4f6fb;
+      --surface: #ffffff;
+      --primary: #1a73e8;
+      --primary-hover: #1557b0;
+      --primary-soft: #e8f0fe;
+      --border: #dde3ea;
+      --radius: 20px;
+      --shadow: 0 4px 14px rgba(26, 115, 232, 0.08);
+      font-family: Roboto, system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .topbar {
+      background: var(--surface);
       border-bottom: 1px solid var(--border);
-      padding: 14px 20px;
+      padding: 12px 20px;
       display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
       align-items: center;
       justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
     }
 
-    .brand { display: flex; align-items: center; gap: 10px; }
-    .brand-badge {
-      background: var(--accent);
+    .brand-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .logo-pill {
+      background: var(--primary);
       color: #fff;
       font-weight: 700;
-      padding: 6px 10px;
-      border-radius: 8px;
-      font-size: 14px;
-    }
-    .brand small { color: var(--muted); display: block; font-size: 12px; }
-
-    .plan-box {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--accent-soft);
-      padding: 8px 12px;
-      border-radius: 10px;
+      padding: 6px 12px;
+      border-radius: calc(var(--radius) - 2px);
       font-size: 13px;
+      letter-spacing: 0.3px;
+    }
+    .os-pill {
+      background: var(--primary-soft);
+      color: var(--primary);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
     }
 
-    main { max-width: 1100px; margin: 20px auto; padding: 0 16px 40px; }
+    .user-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
-    .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-    .tab-btn {
+    .auth-wrapper {
+      max-width: 430px;
+      margin: 36px auto;
+      padding: 0 16px;
+    }
+    .card {
+      background: var(--surface);
       border: 1px solid var(--border);
-      background: var(--card);
-      padding: 9px 14px;
-      border-radius: 8px;
-      cursor: pointer;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: calc(var(--radius) - 4px);
+      padding: 4px;
+      margin-bottom: 16px;
+    }
+    .auth-tab {
+      border: none;
+      background: transparent;
+      padding: 9px;
+      border-radius: calc(var(--radius) - 6px);
       font-weight: 600;
       color: var(--muted);
+      cursor: pointer;
     }
-    .tab-btn.active {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
+    .auth-tab.active {
+      background: var(--surface);
+      color: var(--primary);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
 
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      margin: 12px 0 5px;
     }
-    h2, h3 { margin: 0 0 12px; font-size: 17px; }
-
-    label { display: block; font-size: 12px; color: var(--muted); margin-top: 10px; margin-bottom: 4px; }
     input, select {
       width: 100%;
-      padding: 9px 10px;
+      padding: 11px 12px;
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: calc(var(--radius) - 4px);
       font-size: 14px;
-      background: #fff;
+      background: var(--surface);
+      color: var(--text);
+      outline: none;
+    }
+    input:focus, select:focus { border-color: var(--primary); }
+
+    .btn {
+      border: none;
+      border-radius: calc(var(--radius) - 4px);
+      padding: 11px 16px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: 0.15s ease;
+    }
+    .btn-full { width: 100%; margin-top: 14px; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-outline {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover { background: var(--surface-alt); }
+    .btn-warn { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border); }
+    .btn-danger { background: var(--danger-bg); color: var(--danger-text); }
+    .btn-sm { padding: 6px 10px; font-size: 12px; }
+
+    .divider {
+      text-align: center;
+      margin: 16px 0;
+      position: relative;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .divider::before, .divider::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 40%;
+      height: 1px;
+      background: var(--border);
+    }
+    .divider::before { left: 0; }
+    .divider::after { right: 0; }
+
+    .error-msg {
+      background: var(--danger-bg);
+      color: var(--danger-text);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-top: 12px;
+      display: none;
     }
 
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .container { max-width: 1140px; margin: 20px auto; padding: 0 16px 90px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 16px; }
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-    button.btn {
-      margin-top: 12px;
-      border: none;
-      border-radius: 8px;
-      padding: 9px 14px;
+    .nav-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    body.os-android .nav-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 8px 12px;
+      justify-content: space-around;
+      z-index: 30;
+    }
+    .nav-btn {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      padding: 10px 16px;
+      border-radius: calc(var(--radius) - 4px);
       font-weight: 600;
       cursor: pointer;
+    }
+    body.os-android .nav-btn {
+      border: none;
+      flex: 1;
+      border-radius: 999px;
+      padding: 10px 8px;
       font-size: 13px;
     }
-    .btn-primary { background: var(--accent); color: #fff; }
-    .btn-secondary { background: #eef1f7; color: var(--text); }
-    .btn-warn { background: #fef3c7; color: #92400e; }
-    .btn-danger { background: var(--danger-bg); color: var(--danger-text); }
+    .nav-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
 
     .alert-banner {
       background: var(--warn-bg);
       border: 1px solid var(--warn-border);
-      border-radius: 10px;
-      padding: 12px 14px;
-      margin-bottom: 14px;
-      display: flex;
-      justify-content: space-between;
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      display: none;
       align-items: center;
+      justify-content: space-between;
+      gap: 12px;
       flex-wrap: wrap;
-      gap: 10px;
     }
 
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
-    th, td { text-align: left; padding: 9px 6px; border-bottom: 1px solid var(--border); }
-    th { color: var(--muted); font-size: 12px; }
+    th, td { text-align: left; padding: 10px 6px; border-bottom: 1px solid var(--border); }
+    th { font-size: 12px; color: var(--muted); }
 
-    .pill {
+    .badge {
       display: inline-block;
-      padding: 3px 8px;
+      padding: 3px 9px;
       border-radius: 999px;
       font-size: 11px;
       font-weight: 700;
     }
-    .pill-ok { background: var(--ok-bg); color: var(--ok-text); }
-    .pill-low { background: var(--warn-bg); color: #92400e; }
-    .pill-out { background: var(--danger-bg); color: var(--danger-text); }
+    .badge-ok { background: var(--ok-bg); color: var(--ok-text); }
+    .badge-low { background: var(--warn-bg); color: var(--warn-text); }
+    .badge-out { background: var(--danger-bg); color: var(--danger-text); }
 
-    .menu-preview {
-      border: 1px dashed #cbd5e1;
-      border-radius: 12px;
-      padding: 16px;
-      background: #fcfdff;
+    .empty-state {
+      text-align: center;
+      padding: 28px 12px;
+      color: var(--muted);
+      font-size: 14px;
     }
-    .qr-wrap {
-      margin-top: 14px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-    .footer-note { margin-top: 12px; font-size: 12px; color: var(--muted); }
 
     .panel { display: none; }
     .panel.active { display: block; }
 
+    .menu-sheet {
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      background: var(--surface-alt);
+    }
+
     @media print {
-      header, .tabs, .no-print, .card:not(.printable-card) { display: none !important; }
-      body { background: #fff; }
-      main { margin: 0; padding: 0; max-width: 100%; }
-      .printable-card { border: none; box-shadow: none; padding: 0; }
+      .topbar, .nav-bar, .no-print, .card:not(.printable) { display: none !important; }
+      body { background: #fff !important; }
+      .container { margin: 0; padding: 0; max-width: 100%; }
+      .printable { border: none !important; box-shadow: none !important; padding: 0 !important; }
     }
   </style>
 </head>
 <body>
-  <header>
-    <div class="brand">
-      <span class="brand-badge">Aura Zivo</span>
+
+  <header class="topbar">
+    <div class="brand-group">
+      <span class="logo-pill">Aura Zivo</span>
       <div>
         <strong>Zivo Resto</strong>
-        <small>Stock Alert • Quick Bill • Menu & QR</small>
+        <div style="font-size:12px;color:var(--muted);">Kitchen Stock • Quick Bill • QR Menu</div>
       </div>
+      <span id="osBadge" class="os-pill">Detecting OS...</span>
     </div>
 
-    <div class="plan-box">
-      <span id="planLabel">Plan: <strong>FREE</strong> (Up to 5 stock & 5 menu items)</span>
-      <button class="btn btn-secondary" style="margin:0;padding:6px 10px;" onclick="togglePlan()">
-        Switch Free / Pro (₹99/mo)
+    <div class="user-actions">
+      <button id="installAppBtn" type="button" class="btn btn-primary btn-sm" style="display:none;" onclick="installPWA()">
+        Install App
       </button>
+      <span id="installStatusNote" style="font-size:11px;color:var(--muted);"></span>
+
+      <div id="headerUserArea" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span id="userGreeting" style="font-size:13px;font-weight:600;"></span>
+        <span id="planPill" class="os-pill">Free Plan</span>
+        <button class="btn btn-outline btn-sm" onclick="logoutUser()">Sign Out</button>
+      </div>
     </div>
   </header>
 
-  <main>
-    <div id="lowStockBanner" class="alert-banner" style="display:none;">
-      <div id="lowStockSummary"></div>
-      <button class="btn btn-warn" style="margin:0;" onclick="showLowStockOnly()">Show Low Stock Item</button>
+  <section id="authSection" class="auth-wrapper">
+    <div class="card">
+      <h2 style="margin:0 0 4px;">Welcome to Zivo Resto</h2>
+      <p style="margin:0 0 16px;font-size:13px;color:var(--muted);">
+        Sign in to manage your real restaurant inventory, bills, and QR menu.
+      </p>
+
+      <div class="auth-tabs">
+        <button id="tabLogin" class="auth-tab active" onclick="setAuthMode('login')">Sign In</button>
+        <button id="tabSignup" class="auth-tab" onclick="setAuthMode('signup')">Create Account</button>
+      </div>
+
+      <form id="authForm" onsubmit="handleEmailAuth(event)">
+        <div id="usernameFieldWrap" style="display:none;">
+          <label>Username / Owner Name</label>
+          <input id="authUsername" type="text" placeholder="Enter your username" />
+        </div>
+
+        <label>Email Address</label>
+        <input id="authEmail" type="email" placeholder="you@example.com" required />
+
+        <label>Password (min 6 characters)</label>
+        <input id="authPassword" type="password" minlength="6" placeholder="••••••••" required />
+
+        <button id="authSubmitBtn" type="submit" class="btn btn-primary btn-full">Sign In</button>
+      </form>
+
+      <div class="divider">OR</div>
+
+      <button type="button" class="btn btn-outline btn-full" onclick="handleGoogleSignIn()">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Continue with Google
+      </button>
+
+      <div id="authError" class="error-msg"></div>
+    </div>
+  </section>
+
+  <main id="appSection" class="container" style="display:none;">
+    <div id="lowStockBanner" class="alert-banner">
+      <div id="lowStockText"></div>
+      <button class="btn btn-warn btn-sm" onclick="filterLowStock(true)">Show Low Stock Items</button>
     </div>
 
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('stock', this)">1. Stock & Alerts</button>
-      <button class="tab-btn" onclick="switchTab('bill', this)">2. Quick Bill & Print</button>
-      <button class="tab-btn" onclick="switchTab('menu', this)">3. Menu & QR Code</button>
-    </div>
+    <nav class="nav-bar">
+      <button class="nav-btn active" onclick="openPanel('panelStock', this)">1. Stock & Alerts</button>
+      <button class="nav-btn" onclick="openPanel('panelBill', this)">2. Quick Bill</button>
+      <button class="nav-btn" onclick="openPanel('panelMenu', this)">3. Menu & QR</button>
+    </nav>
 
-    <!-- TAB 1: STOCK -->
-    <section id="stock" class="panel active">
-      <div class="grid">
+    <section id="panelStock" class="panel active">
+      <div class="grid-2">
         <div class="card">
-          <h2>Add / Update Stock Item</h2>
-          <form onsubmit="addStockItem(event)">
-            <label>Item Name</label>
-            <input id="sName" placeholder="e.g., Potato, Onion, Atta" required />
+          <h3 style="margin-top:0;">Add Stock Item</h3>
+          <form onsubmit="createStockItem(event)">
+            <label>Ingredient / Item Name</label>
+            <input id="stockName" placeholder="e.g., Potato, Onion, Atta" required />
 
-            <div class="row">
+            <div class="row-2">
               <div>
-                <label>Current Quantity</label>
-                <input id="sQty" type="number" step="0.1" min="0" placeholder="e.g., 12" required />
+                <label>Available Quantity</label>
+                <input id="stockQty" type="number" step="0.1" min="0" placeholder="0" required />
               </div>
               <div>
                 <label>Unit</label>
-                <select id="sUnit">
+                <select id="stockUnit">
                   <option value="kg">kg</option>
                   <option value="g">g</option>
                   <option value="L">L</option>
@@ -218,19 +403,19 @@
               </div>
             </div>
 
-            <label>Low Stock Warning At (Threshold)</label>
-            <input id="sMin" type="number" step="0.1" min="0" placeholder="e.g., 3" required />
+            <label>Low Stock Warning Limit</label>
+            <input id="stockMin" type="number" step="0.1" min="0" placeholder="e.g., 2" required />
 
-            <button class="btn btn-primary" type="submit">Save Stock Item</button>
+            <button type="submit" class="btn btn-primary btn-full">Save Item</button>
           </form>
         </div>
 
         <div class="card">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-            <h2>Kitchen Inventory</h2>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-              <button class="btn btn-warn" style="margin:0;" onclick="showLowStockOnly()">Show Low Stock Item</button>
-              <button class="btn btn-secondary" style="margin:0;" onclick="showAllStock()">Show All</button>
+            <h3 style="margin:0;">Your Inventory</h3>
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-warn btn-sm" onclick="filterLowStock(true)">Show Low Stock</button>
+              <button class="btn btn-outline btn-sm" onclick="filterLowStock(false)">Show All</button>
             </div>
           </div>
 
@@ -239,49 +424,50 @@
               <tr>
                 <th>Item</th>
                 <th>Left</th>
-                <th>Alert At</th>
                 <th>Status</th>
-                <th>Adjust</th>
+                <th>Update</th>
               </tr>
             </thead>
-            <tbody id="stockTableBody"></tbody>
+            <tbody id="stockTbody"></tbody>
           </table>
-          <div id="freeStockNote" class="footer-note"></div>
+          <div id="stockEmpty" class="empty-state">No stock items added yet. Add your first item on the left.</div>
+          <div id="stockQuota" style="margin-top:10px;font-size:12px;color:var(--muted);"></div>
         </div>
       </div>
     </section>
 
-    <!-- TAB 2: BILL -->
-    <section id="bill" class="panel">
-      <div class="grid">
+    <section id="panelBill" class="panel">
+      <div class="grid-2">
         <div class="card">
-          <h2>Create Small Bill</h2>
-          <label>Select Item (from Menu or type custom)</label>
-          <select id="bMenuSelect" onchange="fillFromMenu()"></select>
+          <h3 style="margin-top:0;">Add Item to Bill</h3>
+          <label>Pick From Your Saved Menu</label>
+          <select id="billMenuPicker" onchange="pickMenuDish()">
+            <option value="">-- Enter Custom Item --</option>
+          </select>
 
-          <div class="row">
+          <div class="row-2">
             <div>
               <label>Item Name</label>
-              <input id="bItemName" placeholder="e.g., Masala Dosa" />
+              <input id="billItemName" placeholder="Dish name" />
             </div>
             <div>
               <label>Price (₹)</label>
-              <input id="bPrice" type="number" min="1" step="0.5" placeholder="60" />
+              <input id="billItemPrice" type="number" min="1" step="0.5" placeholder="0" />
             </div>
           </div>
 
           <label>Quantity</label>
-          <input id="bQty" type="number" min="1" value="1" />
+          <input id="billItemQty" type="number" min="1" value="1" />
 
-          <button class="btn btn-primary" onclick="addBillLine()">Add to Bill</button>
+          <button type="button" class="btn btn-primary btn-full" onclick="addBillItem()">Add to Bill</button>
         </div>
 
-        <div class="card printable-card">
+        <div class="card printable">
           <div style="display:flex;justify-content:space-between;align-items:center;">
-            <h2>Customer Bill</h2>
-            <button class="btn btn-secondary no-print" style="margin:0;" onclick="window.print()">Print Bill</button>
+            <h3 style="margin:0;" id="receiptTitle">Customer Bill</h3>
+            <button type="button" class="btn btn-outline btn-sm no-print" onclick="window.print()">Print Bill</button>
           </div>
-          <p id="billDate" style="font-size:12px;color:var(--muted);margin:4px 0 10px;"></p>
+          <div id="receiptMeta" style="font-size:12px;color:var(--muted);margin-top:4px;"></div>
 
           <table>
             <thead>
@@ -289,405 +475,577 @@
                 <th>Item</th>
                 <th>Qty</th>
                 <th>Rate</th>
-                <th>Amount</th>
+                <th>Total</th>
                 <th class="no-print"></th>
               </tr>
             </thead>
-            <tbody id="billTableBody"></tbody>
+            <tbody id="billTbody"></tbody>
           </table>
+          <div id="billEmpty" class="empty-state">No items in the current bill.</div>
 
-          <h3 style="margin-top:14px;text-align:right;">Total: ₹<span id="billTotal">0</span></h3>
-          <div id="billBadge" class="footer-note"></div>
+          <h3 style="text-align:right;margin:14px 0 4px;">Grand Total: ₹<span id="billGrandTotal">0</span></h3>
+          <div id="billFooterNote" style="font-size:11px;color:var(--muted);"></div>
         </div>
       </div>
     </section>
 
-    <!-- TAB 3: MENU & QR -->
-    <section id="menu" class="panel">
-      <div class="grid">
+    <section id="panelMenu" class="panel">
+      <div class="grid-2">
         <div class="card">
-          <h2>Build Menu & QR with Logo</h2>
-          <label>Shop / Restaurant Name</label>
-          <input id="mShopName" value="Zivo Kitchen" oninput="renderMenuAndQR()" />
+          <h3 style="margin-top:0;">Menu & QR Settings</h3>
+          <label>Restaurant / Shop Name</label>
+          <input id="shopNameInput" placeholder="Enter your restaurant name" oninput="saveShopMeta()" />
 
-          <label>Optional Promo / Ad Line</label>
-          <input id="mPromo" value="Fresh & hot! Ask for combo offers." oninput="renderMenuAndQR()" />
+          <label>Promo / Offer Line (Optional)</label>
+          <input id="shopPromoInput" placeholder="e.g., Free delivery within 2 km" oninput="saveShopMeta()" />
 
-          <label>Link for QR Code (Menu URL, UPI link, or YouTube)</label>
-          <input id="mQrUrl" value="https://example.com/menu" oninput="renderMenuAndQR()" />
+          <label>QR Code Link (Menu URL, UPI Link, or Video)</label>
+          <input id="shopQrUrlInput" placeholder="https://..." oninput="renderMenuPreview()" />
 
-          <label>Upload Logo for QR Center (Optional)</label>
-          <input id="mLogoFile" type="file" accept="image/*" onchange="handleLogoUpload(event)" />
+          <label>Logo for QR Center (Optional)</label>
+          <input type="file" accept="image/*" onchange="loadQrLogo(event)" />
 
-          <hr style="border:none;border-top:1px solid var(--border);margin:14px 0;" />
-          <h3>Add Menu Item</h3>
-          <div class="row">
+          <hr style="border:none;border-top:1px solid var(--border);margin:16px 0;" />
+          <h3 style="margin:0 0 6px;">Add Dish to Menu</h3>
+          <div class="row-2">
             <div>
               <label>Dish Name</label>
-              <input id="mDishName" placeholder="e.g., French Fries" />
+              <input id="menuDishName" placeholder="e.g., Paneer Roll" />
             </div>
             <div>
               <label>Price (₹)</label>
-              <input id="mDishPrice" type="number" min="1" placeholder="80" />
+              <input id="menuDishPrice" type="number" min="1" placeholder="0" />
             </div>
           </div>
-          <button class="btn btn-primary" onclick="addMenuItem()">Add to Menu</button>
+          <button type="button" class="btn btn-primary btn-full" onclick="createMenuItem()">Save Dish</button>
         </div>
 
-        <div class="card printable-card">
+        <div class="card printable">
           <div style="display:flex;justify-content:space-between;align-items:center;">
-            <h2>Menu & QR Preview</h2>
-            <button class="btn btn-secondary no-print" style="margin:0;" onclick="window.print()">Print Menu</button>
+            <h3 style="margin:0;">Printable Menu & QR</h3>
+            <button type="button" class="btn btn-outline btn-sm no-print" onclick="window.print()">Print Menu</button>
           </div>
 
-          <div class="menu-preview">
-            <h3 id="previewShop">Zivo Kitchen</h3>
-            <div id="previewPromo" style="font-size:12px;color:var(--accent);font-weight:600;margin-bottom:8px;"></div>
+          <div class="menu-sheet" style="margin-top:12px;">
+            <h3 id="previewShopName" style="margin:0 0 4px;">My Restaurant</h3>
+            <div id="previewPromoText" style="font-size:12px;color:var(--primary);font-weight:600;margin-bottom:10px;"></div>
+
             <table>
               <thead>
-                <tr><th>Item</th><th style="text-align:right;">Price</th></tr>
+                <tr>
+                  <th>Dish</th>
+                  <th style="text-align:right;">Price</th>
+                  <th class="no-print" style="width:36px;"></th>
+                </tr>
               </thead>
-              <tbody id="menuPreviewBody"></tbody>
+              <tbody id="menuTbody"></tbody>
             </table>
+            <div id="menuEmpty" class="empty-state">No menu items added yet.</div>
 
-            <div class="qr-wrap">
-              <canvas id="qrCanvas" width="140" height="140"></canvas>
+            <div id="qrSection" style="display:none;margin-top:16px;align-items:center;gap:14px;flex-wrap:wrap;">
+              <canvas id="qrCanvas" width="150" height="150"></canvas>
               <div>
-                <strong>Scan for Menu / Info</strong>
-                <div id="qrTargetText" style="font-size:12px;color:var(--muted);word-break:break-all;"></div>
+                <strong>Scan QR Code</strong>
+                <div id="qrUrlCaption" style="font-size:12px;color:var(--muted);word-break:break-all;"></div>
               </div>
             </div>
-            <div id="menuBadge" class="footer-note"></div>
+            <div id="menuFooterNote" style="margin-top:10px;font-size:11px;color:var(--muted);"></div>
           </div>
         </div>
       </div>
     </section>
   </main>
 
+  <!-- SINGLE-FILE PWA MANIFEST & SERVICE WORKER SETUP -->
   <script>
+    (function setupSingleFilePWA() {
+      const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="40" fill="#2563eb"/><text x="96" y="114" font-family="Arial, sans-serif" font-size="72" font-weight="700" fill="#ffffff" text-anchor="middle">ZR</text></svg>`;
+      const iconUrl = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(iconSvg);
+
+      const manifestObj = {
+        name: "Zivo Resto — Aura Zivo",
+        short_name: "Zivo Resto",
+        start_url: location.href,
+        display: "standalone",
+        background_color: "#f3f5f9",
+        theme_color: "#2563eb",
+        icons: [
+          {
+            src: iconUrl,
+            sizes: "192x192",
+            type: "image/svg+xml",
+            purpose: "any"
+          }
+        ]
+      };
+
+      const manifestBlob = new Blob([JSON.stringify(manifestObj)], { type: "application/manifest+json" });
+      const manifestLink = document.createElement("link");
+      manifestLink.rel = "manifest";
+      manifestLink.href = URL.createObjectURL(manifestBlob);
+      document.head.appendChild(manifestLink);
+
+      if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+        const swCode = `
+          const CACHE_NAME = "zivo-resto-v1";
+          self.addEventListener("install", (event) => {
+            event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(["./"])));
+            self.skipWaiting();
+          });
+          self.addEventListener("activate", (event) => {
+            event.waitUntil(self.clients.claim());
+          });
+          self.addEventListener("fetch", (event) => {
+            if (event.request.method !== "GET") return;
+            event.respondWith(
+              fetch(event.request).catch(() => caches.match(event.request))
+            );
+          });
+        `;
+        const swBlob = new Blob([swCode], { type: "application/javascript" });
+        const swUrl = URL.createObjectURL(swBlob);
+        navigator.serviceWorker.register(swUrl).catch(() => {});
+      }
+
+      let deferredPrompt = null;
+      const installBtn = document.getElementById("installAppBtn");
+      const installNote = document.getElementById("installStatusNote");
+
+      window.addEventListener("beforeinstallprompt", (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (installBtn) installBtn.style.display = "inline-flex";
+        if (installNote) installNote.textContent = "";
+      });
+
+      window.installPWA = async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        if (installBtn) installBtn.style.display = "none";
+      };
+
+      window.addEventListener("appinstalled", () => {
+        deferredPrompt = null;
+        if (installBtn) installBtn.style.display = "none";
+        if (installNote) installNote.textContent = "Installed";
+      });
+    })();
+  </script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      updateProfile,
+      GoogleAuthProvider,
+      signInWithPopup,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc,
+      collection,
+      addDoc,
+      updateDoc,
+      deleteDoc,
+      onSnapshot
+    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    function detectOS() {
+      const ua = navigator.userAgent || "";
+      const platform = navigator.userAgentData?.platform || navigator.platform || "";
+      const badge = document.getElementById("osBadge");
+
+      if (/Android/i.test(ua)) {
+        document.body.classList.add("os-android");
+        badge.textContent = "Android OS • Material UI";
+      } else if (/Win/i.test(platform) || /Windows/i.test(ua)) {
+        document.body.classList.add("os-windows");
+        badge.textContent = "Windows OS • Fluent UI";
+      } else if (/iPhone|iPad|iPod/i.test(ua)) {
+        document.body.classList.add("os-android");
+        badge.textContent = "iOS • Mobile UI";
+      } else if (/Mac/i.test(platform) || /Mac/i.test(ua)) {
+        document.body.classList.add("os-windows");
+        badge.textContent = "macOS • Desktop UI";
+      } else {
+        document.body.classList.add("os-windows");
+        badge.textContent = "Web OS";
+      }
+    }
+    detectOS();
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDrU8dcQNzp-U0LDXD_dyza7zDIYEnbJJ0",
+      authDomain: "zivo-3f8d7.firebaseapp.com",
+      projectId: "zivo-3f8d7",
+      storageBucket: "zivo-3f8d7.firebasestorage.app",
+      messagingSenderId: "245798482497",
+      appId: "1:245798482497:web:2b56a68910b6e9e8060cc0",
+      measurementId: "G-3TG2V9GD1V"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
     const FREE_LIMIT = 5;
-    let isPro = JSON.parse(localStorage.getItem('zivo_pro') || 'false');
-    let onlyLowStock = false;
-    let logoImg = null;
+    let authMode = "login";
+    let currentUser = null;
+    let userPlan = "free";
+    let stockList = [];
+    let menuList = [];
+    let currentBill = [];
+    let showOnlyLow = false;
+    let qrLogoImage = null;
+    let unsubStock = null;
+    let unsubMenu = null;
 
-    let stock = JSON.parse(localStorage.getItem('zivo_stock') || 'null') || [
-      { id: 1, name: 'Potato', qty: 2, unit: 'kg', min: 3 },
-      { id: 2, name: 'Onion', qty: 3, unit: 'kg', min: 2 },
-      { id: 3, name: 'Atta', qty: 5, unit: 'kg', min: 2 }
-    ];
+    window.setAuthMode = (mode) => {
+      authMode = mode;
+      document.getElementById("tabLogin").classList.toggle("active", mode === "login");
+      document.getElementById("tabSignup").classList.toggle("active", mode === "signup");
+      document.getElementById("usernameFieldWrap").style.display = mode === "signup" ? "block" : "none";
+      document.getElementById("authUsername").required = mode === "signup";
+      document.getElementById("authSubmitBtn").textContent = mode === "login" ? "Sign In" : "Create Account";
+      document.getElementById("authError").style.display = "none";
+    };
 
-    let menu = JSON.parse(localStorage.getItem('zivo_menu') || 'null') || [
-      { id: 1, name: 'French Fries', price: 80 },
-      { id: 2, name: 'Veg Sandwich', price: 70 }
-    ];
-
-    let billItems = [];
-
-    function saveAll() {
-      localStorage.setItem('zivo_pro', JSON.stringify(isPro));
-      localStorage.setItem('zivo_stock', JSON.stringify(stock));
-      localStorage.setItem('zivo_menu', JSON.stringify(menu));
+    function showAuthError(msg) {
+      const box = document.getElementById("authError");
+      box.textContent = msg;
+      box.style.display = "block";
     }
 
-    function togglePlan() {
-      isPro = !isPro;
-      saveAll();
-      renderAll();
-    }
-
-    function switchTab(tabId, btn) {
-      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      btn.classList.add('active');
-    }
-
-    function addStockItem(e) {
+    window.handleEmailAuth = async (e) => {
       e.preventDefault();
-      if (!isPro && stock.length >= FREE_LIMIT) {
-        alert('Free plan allows up to ' + FREE_LIMIT + ' stock items. Switch to Pro (₹99/mo) for unlimited items.');
+      document.getElementById("authError").style.display = "none";
+      const email = document.getElementById("authEmail").value.trim();
+      const password = document.getElementById("authPassword").value;
+      const username = document.getElementById("authUsername").value.trim();
+
+      try {
+        if (authMode === "signup") {
+          const cred = await createUserWithEmailAndPassword(auth, email, password);
+          await updateProfile(cred.user, { displayName: username });
+          await setDoc(doc(db, "users", cred.user.uid), {
+            username,
+            email,
+            plan: "free",
+            shopName: "",
+            promoLine: ""
+          });
+        } else {
+          await signInWithEmailAndPassword(auth, email, password);
+        }
+      } catch (err) {
+        showAuthError(err.message.replace("Firebase:", "").trim());
+      }
+    };
+
+    window.handleGoogleSignIn = async () => {
+      document.getElementById("authError").style.display = "none";
+      try {
+        const provider = new GoogleAuthProvider();
+        const result = await signInWithPopup(auth, provider);
+        const userRef = doc(db, "users", result.user.uid);
+        const snap = await getDoc(userRef);
+        if (!snap.exists()) {
+          await setDoc(userRef, {
+            username: result.user.displayName || result.user.email.split("@")[0],
+            email: result.user.email,
+            plan: "free",
+            shopName: "",
+            promoLine: ""
+          });
+        }
+      } catch (err) {
+        showAuthError(err.message.replace("Firebase:", "").trim());
+      }
+    };
+
+    window.logoutUser = async () => {
+      if (unsubStock) unsubStock();
+      if (unsubMenu) unsubMenu();
+      await signOut(auth);
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user;
+      if (!user) {
+        document.getElementById("authSection").style.display = "block";
+        document.getElementById("appSection").style.display = "none";
+        document.getElementById("headerUserArea").style.display = "none";
         return;
       }
-      const name = document.getElementById('sName').value.trim();
-      const qty = parseFloat(document.getElementById('sQty').value);
-      const unit = document.getElementById('sUnit').value;
-      const min = parseFloat(document.getElementById('sMin').value);
 
-      stock.push({ id: Date.now(), name, qty, unit, min });
-      saveAll();
+      document.getElementById("authSection").style.display = "none";
+      document.getElementById("appSection").style.display = "block";
+      document.getElementById("headerUserArea").style.display = "flex";
+
+      const userRef = doc(db, "users", user.uid);
+      const snap = await getDoc(userRef);
+      const profile = snap.exists() ? snap.data() : { plan: "free" };
+      userPlan = profile.plan || "free";
+
+      const displayName = user.displayName || profile.username || user.email;
+      document.getElementById("userGreeting").textContent = displayName;
+      document.getElementById("planPill").textContent = userPlan === "pro" ? "Pro Plan (₹99/mo)" : "Free Plan";
+      document.getElementById("shopNameInput").value = profile.shopName || "";
+      document.getElementById("shopPromoInput").value = profile.promoLine || "";
+
+      unsubStock = onSnapshot(collection(db, "users", user.uid, "stock"), (snapshot) => {
+        stockList = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderStock();
+      });
+
+      unsubMenu = onSnapshot(collection(db, "users", user.uid, "menu"), (snapshot) => {
+        menuList = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderMenuPreview();
+        renderBillPicker();
+      });
+
+      renderBill();
+    });
+
+    window.openPanel = (panelId, btn) => {
+      document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+      document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+      document.getElementById(panelId).classList.add("active");
+      btn.classList.add("active");
+    };
+
+    window.createStockItem = async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+      if (userPlan !== "pro" && stockList.length >= FREE_LIMIT) {
+        alert(`Free plan allows up to ${FREE_LIMIT} stock items. Upgrade to Pro (₹99/mo) for unlimited items.`);
+        return;
+      }
+      const name = document.getElementById("stockName").value.trim();
+      const qty = parseFloat(document.getElementById("stockQty").value);
+      const unit = document.getElementById("stockUnit").value;
+      const min = parseFloat(document.getElementById("stockMin").value);
+
+      await addDoc(collection(db, "users", currentUser.uid, "stock"), { name, qty, unit, min });
       e.target.reset();
-      renderAll();
-    }
+    };
 
-    function changeQty(id, delta) {
-      const item = stock.find(s => s.id === id);
-      if (!item) return;
-      item.qty = Math.max(0, +(item.qty + delta).toFixed(2));
-      saveAll();
-      renderAll();
-    }
+    window.adjustStock = async (id, delta) => {
+      const item = stockList.find(s => s.id === id);
+      if (!item || !currentUser) return;
+      const nextQty = Math.max(0, +(item.qty + delta).toFixed(2));
+      await updateDoc(doc(db, "users", currentUser.uid, "stock", id), { qty: nextQty });
+    };
 
-    function deleteStock(id) {
-      stock = stock.filter(s => s.id !== id);
-      saveAll();
-      renderAll();
-    }
+    window.removeStock = async (id) => {
+      if (!currentUser) return;
+      await deleteDoc(doc(db, "users", currentUser.uid, "stock", id));
+    };
 
-    function showLowStockOnly() {
-      onlyLowStock = true;
-      switchTab('stock', document.querySelectorAll('.tab-btn')[0]);
+    window.filterLowStock = (onlyLow) => {
+      showOnlyLow = onlyLow;
       renderStock();
-    }
-
-    function showAllStock() {
-      onlyLowStock = false;
-      renderStock();
-    }
+    };
 
     function renderStock() {
-      const lowItems = stock.filter(s => s.qty <= s.min);
-      const banner = document.getElementById('lowStockBanner');
-      const summary = document.getElementById('lowStockSummary');
-
+      const lowItems = stockList.filter(s => s.qty <= s.min);
+      const banner = document.getElementById("lowStockBanner");
       if (lowItems.length > 0) {
-        banner.style.display = 'flex';
+        banner.style.display = "flex";
         const first = lowItems[0];
-        summary.innerHTML = `<strong>Warning:</strong> ${first.qty} ${first.unit} of ${first.name} is left (${lowItems.length} low/finished item${lowItems.length > 1 ? 's' : ''} total).`;
+        document.getElementById("lowStockText").innerHTML =
+          `<strong>Low Stock Alert:</strong> ${first.qty} ${first.unit} of ${first.name} left (${lowItems.length} low/finished item${lowItems.length > 1 ? "s" : ""}).`;
       } else {
-        banner.style.display = 'none';
+        banner.style.display = "none";
       }
 
-      const listToShow = onlyLowStock ? lowItems : stock;
-      const tbody = document.getElementById('stockTableBody');
-      tbody.innerHTML = '';
+      const items = showOnlyLow ? lowItems : stockList;
+      const tbody = document.getElementById("stockTbody");
+      tbody.innerHTML = "";
+      document.getElementById("stockEmpty").style.display = items.length === 0 ? "block" : "none";
 
-      if (listToShow.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="color:var(--muted);">No items to show.</td></tr>`;
-      } else {
-        listToShow.forEach(item => {
-          let statusHtml = `<span class="pill pill-ok">OK</span>`;
-          if (item.qty <= 0) {
-            statusHtml = `<span class="pill pill-out">Finished</span>`;
-          } else if (item.qty <= item.min) {
-            statusHtml = `<span class="pill pill-low">Low (${item.qty} ${item.unit} left)</span>`;
-          }
+      items.forEach(item => {
+        let badge = `<span class="badge badge-ok">In Stock</span>`;
+        if (item.qty <= 0) badge = `<span class="badge badge-out">Finished</span>`;
+        else if (item.qty <= item.min) badge = `<span class="badge badge-low">${item.qty} ${item.unit} left</span>`;
 
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td><strong>${item.name}</strong></td>
-            <td>${item.qty} ${item.unit}</td>
-            <td>${item.min} ${item.unit}</td>
-            <td>${statusHtml}</td>
-            <td>
-              <button class="btn btn-secondary" style="margin:0;padding:4px 8px;" onclick="changeQty(${item.id}, -1)">-1</button>
-              <button class="btn btn-secondary" style="margin:0;padding:4px 8px;" onclick="changeQty(${item.id}, 1)">+1</button>
-              <button class="btn btn-danger" style="margin:0;padding:4px 8px;" onclick="deleteStock(${item.id})">×</button>
-            </td>
-          `;
-          tbody.appendChild(tr);
-        });
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${item.name}</strong></td>
+          <td>${item.qty} ${item.unit}</td>
+          <td>${badge}</td>
+          <td>
+            <button class="btn btn-outline btn-sm" onclick="adjustStock('${item.id}', -1)">-1</button>
+            <button class="btn btn-outline btn-sm" onclick="adjustStock('${item.id}', 1)">+1</button>
+            <button class="btn btn-danger btn-sm" onclick="removeStock('${item.id}')">×</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById("stockQuota").textContent =
+        userPlan === "pro" ? "Pro Plan: Unlimited items" : `Free Plan: ${stockList.length}/${FREE_LIMIT} items used`;
+    }
+
+    function renderBillPicker() {
+      const picker = document.getElementById("billMenuPicker");
+      picker.innerHTML = `<option value="">-- Enter Custom Item --</option>` +
+        menuList.map(m => `<option value="${m.id}">${m.name} (₹${m.price})</option>`).join("");
+    }
+
+    window.pickMenuDish = () => {
+      const id = document.getElementById("billMenuPicker").value;
+      const dish = menuList.find(m => m.id === id);
+      if (dish) {
+        document.getElementById("billItemName").value = dish.name;
+        document.getElementById("billItemPrice").value = dish.price;
       }
+    };
 
-      document.getElementById('freeStockNote').textContent = isPro
-        ? 'Pro active: Unlimited stock items.'
-        : `Free plan: ${stock.length}/${FREE_LIMIT} stock items used.`;
-    }
-
-    function renderMenuSelect() {
-      const sel = document.getElementById('bMenuSelect');
-      sel.innerHTML = `<option value="">-- Custom Item --</option>` + menu.map(m =>
-        `<option value="${m.id}">${m.name} (₹${m.price})</option>`
-      ).join('');
-    }
-
-    function fillFromMenu() {
-      const id = Number(document.getElementById('bMenuSelect').value);
-      const found = menu.find(m => m.id === id);
-      if (found) {
-        document.getElementById('bItemName').value = found.name;
-        document.getElementById('bPrice').value = found.price;
-      }
-    }
-
-    function addBillLine() {
-      const name = document.getElementById('bItemName').value.trim();
-      const price = parseFloat(document.getElementById('bPrice').value);
-      const qty = parseInt(document.getElementById('bQty').value, 10) || 1;
+    window.addBillItem = () => {
+      const name = document.getElementById("billItemName").value.trim();
+      const price = parseFloat(document.getElementById("billItemPrice").value);
+      const qty = parseInt(document.getElementById("billItemQty").value, 10) || 1;
       if (!name || isNaN(price) || price <= 0) return;
 
-      billItems.push({ name, price, qty });
-      document.getElementById('bItemName').value = '';
-      document.getElementById('bPrice').value = '';
-      document.getElementById('bQty').value = '1';
-      document.getElementById('bMenuSelect').value = '';
+      currentBill.push({ name, price, qty });
+      document.getElementById("billItemName").value = "";
+      document.getElementById("billItemPrice").value = "";
+      document.getElementById("billItemQty").value = "1";
+      document.getElementById("billMenuPicker").value = "";
       renderBill();
-    }
+    };
 
-    function removeBillLine(index) {
-      billItems.splice(index, 1);
+    window.deleteBillItem = (idx) => {
+      currentBill.splice(idx, 1);
       renderBill();
-    }
+    };
 
     function renderBill() {
-      document.getElementById('billDate').textContent = 'Date: ' + new Date().toLocaleString('en-IN');
-      const tbody = document.getElementById('billTableBody');
-      tbody.innerHTML = '';
-      let total = 0;
+      const shopName = document.getElementById("shopNameInput").value.trim();
+      document.getElementById("receiptTitle").textContent = shopName || "Customer Bill";
+      document.getElementById("receiptMeta").textContent = new Date().toLocaleString("en-IN");
 
-      billItems.forEach((line, idx) => {
-        const amt = line.price * line.qty;
-        total += amt;
+      const tbody = document.getElementById("billTbody");
+      tbody.innerHTML = "";
+      document.getElementById("billEmpty").style.display = currentBill.length === 0 ? "block" : "none";
+
+      let grand = 0;
+      currentBill.forEach((row, idx) => {
+        const sub = row.price * row.qty;
+        grand += sub;
         tbody.innerHTML += `
           <tr>
-            <td>${line.name}</td>
-            <td>${line.qty}</td>
-            <td>₹${line.price}</td>
-            <td>₹${amt}</td>
-            <td class="no-print"><button class="btn btn-danger" style="margin:0;padding:2px 7px;" onclick="removeBillLine(${idx})">×</button></td>
+            <td>${row.name}</td>
+            <td>${row.qty}</td>
+            <td>₹${row.price}</td>
+            <td>₹${sub}</td>
+            <td class="no-print"><button class="btn btn-danger btn-sm" onclick="deleteBillItem(${idx})">×</button></td>
           </tr>
         `;
       });
 
-      document.getElementById('billTotal').textContent = total;
-      document.getElementById('billBadge').textContent = isPro
-        ? 'Aura Zivo Pro Bill'
-        : 'Powered by Aura Zivo (Free Plan)';
+      document.getElementById("billGrandTotal").textContent = grand;
+      document.getElementById("billFooterNote").textContent =
+        userPlan === "pro" ? "" : "Generated with Zivo Resto (Aura Zivo)";
     }
 
-    function addMenuItem() {
-      if (!isPro && menu.length >= FREE_LIMIT) {
-        alert('Free plan allows up to ' + FREE_LIMIT + ' menu items. Switch to Pro (₹99/mo) for unlimited items.');
+    window.saveShopMeta = async () => {
+      renderMenuPreview();
+      renderBill();
+      if (!currentUser) return;
+      await setDoc(doc(db, "users", currentUser.uid), {
+        shopName: document.getElementById("shopNameInput").value.trim(),
+        promoLine: document.getElementById("shopPromoInput").value.trim()
+      }, { merge: true });
+    };
+
+    window.createMenuItem = async () => {
+      if (!currentUser) return;
+      if (userPlan !== "pro" && menuList.length >= FREE_LIMIT) {
+        alert(`Free plan allows up to ${FREE_LIMIT} menu items. Upgrade to Pro (₹99/mo) for unlimited items.`);
         return;
       }
-      const name = document.getElementById('mDishName').value.trim();
-      const price = parseFloat(document.getElementById('mDishPrice').value);
+      const name = document.getElementById("menuDishName").value.trim();
+      const price = parseFloat(document.getElementById("menuDishPrice").value);
       if (!name || isNaN(price) || price <= 0) return;
 
-      menu.push({ id: Date.now(), name, price });
-      document.getElementById('mDishName').value = '';
-      document.getElementById('mDishPrice').value = '';
-      saveAll();
-      renderAll();
-    }
+      await addDoc(collection(db, "users", currentUser.uid, "menu"), { name, price });
+      document.getElementById("menuDishName").value = "";
+      document.getElementById("menuDishPrice").value = "";
+    };
 
-    function handleLogoUpload(e) {
+    window.removeMenuItem = async (id) => {
+      if (!currentUser) return;
+      await deleteDoc(doc(db, "users", currentUser.uid, "menu", id));
+    };
+
+    window.loadQrLogo = (e) => {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
       reader.onload = () => {
         const img = new Image();
         img.onload = () => {
-          logoImg = img;
-          renderMenuAndQR();
+          qrLogoImage = img;
+          renderMenuPreview();
         };
         img.src = reader.result;
       };
       reader.readAsDataURL(file);
-    }
+    };
 
-    // Simple deterministic matrix QR generator for clean visual display + logo overlay
-    function drawQRWithLogo(canvas, text, logo) {
-      const ctx = canvas.getContext('2d');
-      const size = canvas.width;
-      const cells = 21;
-      const cellSize = Math.floor(size / cells);
-      const offset = Math.floor((size - cells * cellSize) / 2);
+    async function renderMenuPreview() {
+      const shop = document.getElementById("shopNameInput").value.trim() || "Restaurant Menu";
+      const promo = document.getElementById("shopPromoInput").value.trim();
+      const qrUrl = document.getElementById("shopQrUrlInput").value.trim();
 
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, size, size);
+      document.getElementById("previewShopName").textContent = shop;
+      document.getElementById("previewPromoText").textContent = promo;
 
-      // Deterministic pseudo-random bits from text so QR pattern matches input text
-      let hash = 2166136261;
-      for (let i = 0; i < text.length; i++) {
-        hash ^= text.charCodeAt(i);
-        hash = Math.imul(hash, 16777619);
-      }
+      const tbody = document.getElementById("menuTbody");
+      tbody.innerHTML = menuList.map(m => `
+        <tr>
+          <td>${m.name}</td>
+          <td style="text-align:right;">₹${m.price}</td>
+          <td class="no-print"><button class="btn btn-danger btn-sm" onclick="removeMenuItem('${m.id}')">×</button></td>
+        </tr>
+      `).join("");
+      document.getElementById("menuEmpty").style.display = menuList.length === 0 ? "block" : "none";
 
-      function isFinder(r, c) {
-        return (r < 7 && c < 7) || (r < 7 && c >= cells - 7) || (r >= cells - 7 && c < 7);
-      }
-
-      function drawFinder(startR, startC) {
-        for (let r = 0; r < 7; r++) {
-          for (let c = 0; c < 7; c++) {
-            const border = r === 0 || r === 6 || c === 0 || c === 6;
-            const center = r >= 2 && r <= 4 && c >= 2 && c <= 4;
-            ctx.fillStyle = (border || center) ? '#111827' : '#ffffff';
-            ctx.fillRect(offset + (startC + c) * cellSize, offset + (startR + r) * cellSize, cellSize, cellSize);
-          }
+      const qrSection = document.getElementById("qrSection");
+      if (qrUrl && window.QRCode) {
+        qrSection.style.display = "flex";
+        document.getElementById("qrUrlCaption").textContent = qrUrl;
+        const canvas = document.getElementById("qrCanvas");
+        await window.QRCode.toCanvas(canvas, qrUrl, {
+          width: 150,
+          margin: 1,
+          errorCorrectionLevel: "H"
+        });
+        if (qrLogoImage) {
+          const ctx = canvas.getContext("2d");
+          const logoSize = 36;
+          const pos = (canvas.width - logoSize) / 2;
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(pos - 3, pos - 3, logoSize + 6, logoSize + 6);
+          ctx.drawImage(qrLogoImage, pos, pos, logoSize, logoSize);
         }
-      }
-
-      for (let r = 0; r < cells; r++) {
-        for (let c = 0; c < cells; c++) {
-          if (isFinder(r, c)) continue;
-          hash = (hash * 1664525 + 1013904223) >>> 0;
-          if ((hash & 1) === 1) {
-            ctx.fillStyle = '#111827';
-            ctx.fillRect(offset + c * cellSize, offset + r * cellSize, cellSize, cellSize);
-          }
-        }
-      }
-
-      drawFinder(0, 0);
-      drawFinder(0, cells - 7);
-      drawFinder(cells - 7, 0);
-
-      // Center box for logo
-      const box = Math.floor(size * 0.24);
-      const boxPos = Math.floor((size - box) / 2);
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(boxPos - 3, boxPos - 3, box + 6, box + 6);
-
-      if (logo) {
-        ctx.drawImage(logo, boxPos, boxPos, box, box);
       } else {
-        ctx.fillStyle = '#2563eb';
-        ctx.fillRect(boxPos, boxPos, box, box);
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 12px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('ZIVO', size / 2, size / 2);
+        qrSection.style.display = "none";
       }
+
+      document.getElementById("menuFooterNote").textContent =
+        userPlan === "pro" ? "" : `Free Plan: ${menuList.length}/${FREE_LIMIT} dishes • Powered by Aura Zivo`;
     }
-
-    function renderMenuAndQR() {
-      const shop = document.getElementById('mShopName').value.trim() || 'My Restaurant';
-      const promo = document.getElementById('mPromo').value.trim();
-      const url = document.getElementById('mQrUrl').value.trim() || 'https://aurazivo.in';
-
-      document.getElementById('previewShop').textContent = shop;
-      document.getElementById('previewPromo').textContent = promo;
-      document.getElementById('qrTargetText').textContent = url;
-
-      const tbody = document.getElementById('menuPreviewBody');
-      tbody.innerHTML = menu.map(item =>
-        `<tr><td>${item.name}</td><td style="text-align:right;">₹${item.price}</td></tr>`
-      ).join('');
-
-      drawQRWithLogo(document.getElementById('qrCanvas'), url, logoImg);
-
-      document.getElementById('menuBadge').textContent = isPro
-        ? 'Pro active: Unlimited menu items.'
-        : `Free plan: ${menu.length}/${FREE_LIMIT} menu items used.`;
-    }
-
-    function renderPlanHeader() {
-      document.getElementById('planLabel').innerHTML = isPro
-        ? 'Plan: <strong>PRO (₹99/mo)</strong> — Unlimited items'
-        : `Plan: <strong>FREE</strong> (Up to ${FREE_LIMIT} stock & ${FREE_LIMIT} menu items)`;
-    }
-
-    function renderAll() {
-      renderPlanHeader();
-      renderStock();
-      renderMenuSelect();
-      renderBill();
-      renderMenuAndQR();
-    }
-
-    renderAll();
   </script>
 </body>
 </html>
