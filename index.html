@@ -3,1372 +3,511 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0f52ba" />
-  <title>Zivo Resto</title>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <title>Zivo Resto — Inventory, Billing & Menu</title>
   <style>
     :root {
-      --bg: #f4f6f9;
-      --surface: #ffffff;
-      --surface-alt: #f8fafc;
-      --text: #111827;
-      --muted: #6b7280;
-      --primary: #0f52ba;
-      --primary-hover: #0b3f8f;
-      --primary-soft: #e8f0fe;
-      --border: #e5e7eb;
-      --warn-bg: #fffbeb;
-      --warn-border: #f59e0b;
-      --warn-text: #92400e;
-      --danger-bg: #fef2f2;
-      --danger-text: #b91c1c;
-      --ok-bg: #ecfdf5;
-      --ok-text: #047857;
-      --radius: 12px;
-      --shadow: 0 2px 10px rgba(17, 24, 39, 0.05);
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --primary: #1d4ed8;
+      --primary-soft: #eff6ff;
+      --border: #e2e8f0;
+      --ok: #15803d;
+      --warn: #b45309;
     }
-
-    body.os-windows {
-      --radius: 8px;
-      --shadow: 0 2px 6px rgba(17, 24, 39, 0.06);
-      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-    }
-
-    body.os-android {
-      --radius: 18px;
-      --shadow: 0 4px 14px rgba(15, 82, 186, 0.08);
-      font-family: Roboto, system-ui, -apple-system, sans-serif;
-    }
-
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-    }
-
-    .topbar {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 12px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-      position: sticky;
-      top: 0;
-      z-index: 20;
-    }
-
-    .brand-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .symbol-box {
-      width: 36px;
-      height: 36px;
-      border-radius: calc(var(--radius) - 2px);
-      background: var(--primary);
-      color: #ffffff;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .brand-title { font-size: 16px; font-weight: 700; line-height: 1.2; }
-    .brand-sub { font-size: 12px; color: var(--muted); }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .tag {
-      background: var(--primary-soft);
-      color: var(--primary);
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    .auth-wrap {
-      max-width: 440px;
-      margin: 32px auto;
-      padding: 0 16px;
-    }
-
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 20px;
-    }
-
-    .auth-tabs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      background: var(--surface-alt);
-      border: 1px solid var(--border);
-      border-radius: calc(var(--radius) - 4px);
-      padding: 4px;
-      margin-bottom: 14px;
-    }
-
-    .auth-tab {
-      border: none;
-      background: transparent;
-      padding: 9px;
-      border-radius: calc(var(--radius) - 6px);
-      font-weight: 600;
-      color: var(--muted);
-      cursor: pointer;
-    }
-
-    .auth-tab.active {
-      background: var(--surface);
-      color: var(--primary);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-    }
-
-    label {
-      display: block;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--muted);
-      margin: 12px 0 5px;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 16px; padding-bottom: 48px; }
+    .wrap { max-width: 900px; margin: 0 auto; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 16px; }
+    .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+    h1 { font-size: 1.3rem; }
+    h2 { font-size: 1.05rem; margin-bottom: 10px; }
+    .muted { color: var(--muted); font-size: 0.86rem; }
+    label { display: block; font-size: 0.82rem; color: var(--muted); margin-top: 10px; margin-bottom: 4px; }
     input, select {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: calc(var(--radius) - 4px);
-      font-size: 14px;
-      background: var(--surface);
-      color: var(--text);
-      outline: none;
+      width: 100%; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 0.92rem; background: #fff; color: var(--text);
     }
-
-    input:focus, select:focus { border-color: var(--primary); }
-
-    .terms-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      margin-top: 12px;
-      font-size: 12px;
-      color: var(--muted);
+    button {
+      background: var(--primary); color: #fff; border: none; border-radius: 10px;
+      padding: 10px 14px; font-weight: 600; cursor: pointer; font-size: 0.88rem;
     }
-
-    .terms-row input[type="checkbox"] {
-      width: auto;
-      margin-top: 2px;
-      flex-shrink: 0;
-    }
-
-    .link-btn {
-      background: none;
-      border: none;
-      padding: 0;
-      color: var(--primary);
-      font-weight: 600;
-      font-size: inherit;
-      cursor: pointer;
-      text-decoration: underline;
-    }
-
-    .btn {
-      border: none;
-      border-radius: calc(var(--radius) - 4px);
-      padding: 10px 15px;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-      transition: 0.15s ease;
-    }
-
-    .btn-full { width: 100%; margin-top: 12px; }
-    .btn-primary { background: var(--primary); color: #ffffff; }
-    .btn-primary:hover { background: var(--primary-hover); }
-    .btn-outline {
-      background: var(--surface);
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-    .btn-outline:hover { background: var(--surface-alt); }
-    .btn-warn {
-      background: var(--warn-bg);
-      color: var(--warn-text);
-      border: 1px solid var(--warn-border);
-    }
-    .btn-danger { background: var(--danger-bg); color: var(--danger-text); }
-    .btn-sm { padding: 6px 10px; font-size: 12px; }
-
-    .divider {
-      text-align: center;
-      margin: 14px 0;
-      position: relative;
-      font-size: 12px;
-      color: var(--muted);
-    }
-    .divider::before, .divider::after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      width: 42%;
-      height: 1px;
-      background: var(--border);
-    }
-    .divider::before { left: 0; }
-    .divider::after { right: 0; }
-
-    .error-box {
-      background: var(--danger-bg);
-      color: var(--danger-text);
-      padding: 10px 12px;
-      border-radius: 8px;
-      font-size: 13px;
-      margin-top: 12px;
-      display: none;
-    }
-
-    .container {
-      max-width: 1120px;
-      margin: 20px auto;
-      padding: 0 16px 88px;
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 16px;
-    }
-
-    .row-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .nav-bar {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-    }
-
-    body.os-android .nav-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      margin: 0;
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      padding: 8px 12px;
-      justify-content: space-around;
-      z-index: 30;
-    }
-
-    .nav-btn {
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--muted);
-      padding: 9px 15px;
-      border-radius: calc(var(--radius) - 4px);
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    body.os-android .nav-btn {
-      border: none;
-      flex: 1;
-      border-radius: 999px;
-      padding: 10px 8px;
-      font-size: 13px;
-    }
-
-    .nav-btn.active {
-      background: var(--primary);
-      color: #ffffff;
-      border-color: var(--primary);
-    }
-
-    .alert-banner {
-      background: var(--warn-bg);
-      border: 1px solid var(--warn-border);
-      border-radius: var(--radius);
-      padding: 12px 16px;
-      margin-bottom: 16px;
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-      font-size: 14px;
-    }
-
-    th, td {
-      text-align: left;
-      padding: 10px 6px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    th { font-size: 12px; color: var(--muted); }
-
-    .badge {
-      display: inline-block;
-      padding: 3px 9px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-    .badge-ok { background: var(--ok-bg); color: var(--ok-text); }
-    .badge-low { background: var(--warn-bg); color: var(--warn-text); }
-    .badge-out { background: var(--danger-bg); color: var(--danger-text); }
-
-    .empty-state {
-      text-align: center;
-      padding: 24px 12px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .panel { display: none; }
-    .panel.active { display: block; }
-
-    /* A4 Menu Sheet */
-    .a4-sheet {
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: calc(var(--radius) - 2px);
-      padding: 22px;
-      min-height: 420px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .a4-header {
-      border-bottom: 2px solid var(--primary);
-      padding-bottom: 10px;
-      margin-bottom: 12px;
-    }
-
-    .a4-contact {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 4px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .a4-promo {
-      margin-top: 8px;
-      padding: 7px 10px;
-      background: var(--primary-soft);
-      color: var(--primary);
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    .a4-footer {
-      margin-top: 18px;
-      padding-top: 10px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 11px;
-      color: var(--muted);
-    }
-
-    .app-footer {
-      max-width: 1120px;
-      margin: 24px auto 16px;
-      padding: 14px 16px;
-      border-top: 1px solid var(--border);
-      font-size: 12px;
-      color: var(--muted);
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    /* Terms Modal */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(17, 24, 39, 0.45);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      z-index: 60;
-    }
-
-    .modal-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      max-width: 500px;
-      width: 100%;
-      padding: 20px;
-      max-height: 85vh;
-      overflow-y: auto;
-    }
-
-    @page {
-      size: A4 portrait;
-      margin: 12mm;
-    }
-
-    @media print {
-      .topbar, .nav-bar, .no-print, .app-footer, .modal-backdrop, .card:not(.printable) {
-        display: none !important;
-      }
-      body {
-        background: #ffffff !important;
-      }
-      .container {
-        margin: 0 !important;
-        padding: 0 !important;
-        max-width: 100% !important;
-      }
-      .printable {
-        border: none !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-      }
-      .a4-sheet {
-        border: none !important;
-        padding: 0 !important;
-        min-height: auto !important;
-      }
-      .page-num-text::after {
-        content: " • Page " counter(page) " of " counter(pages);
-      }
-    }
+    button.secondary { background: var(--primary-soft); color: var(--primary); border: 1px solid #bfdbfe; }
+    button.sm { padding: 6px 10px; font-size: 0.8rem; }
+    .pill { padding: 6px 12px; border-radius: 999px; font-size: 0.8rem; font-weight: 600; border: 1px solid var(--border); background: #fff; color: var(--text); }
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .tab-btn.active { background: var(--primary); color: #fff; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.88rem; }
+    th, td { text-align: left; padding: 9px 6px; border-bottom: 1px solid var(--border); }
+    th { color: var(--muted); }
+    .check-row { display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: 0.88rem; }
+    .check-row input { width: auto; }
+    .hidden { display: none; }
+    .notice { margin-top: 10px; padding: 10px 12px; border-radius: 10px; background: var(--primary-soft); color: var(--primary); font-size: 0.86rem; }
   </style>
 </head>
 <body>
-
-  <header class="topbar">
-    <div class="brand-left">
-      <div class="symbol-box" aria-hidden="true">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 6h16L4 18h16" />
-        </svg>
-      </div>
-      <div>
-        <div class="brand-title">Zivo Resto</div>
-        <div class="brand-sub">Inventory • Billing • A4 Menu</div>
-      </div>
-    </div>
-
-    <div class="header-right">
-      <button id="installBtn" type="button" class="btn btn-primary btn-sm" style="display:none;" onclick="installApp()">
-        Install App
-      </button>
-      <span id="installHint" style="font-size:11px;color:var(--muted);"></span>
-
-      <div id="userHeaderGroup" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;">
-        <span id="userNameTag" style="font-size:13px;font-weight:600;"></span>
-        <span id="planTag" class="tag">Free Plan</span>
-        <button type="button" class="btn btn-outline btn-sm" onclick="signOutAccount()">Sign Out</button>
-      </div>
-    </div>
-  </header>
-
-  <!-- LOGIN / SIGN UP -->
-  <section id="authView" class="auth-wrap">
+  <div class="wrap">
+    <!-- HEADER -->
     <div class="card">
-      <h2 style="margin:0 0 4px;">Zivo Resto Sign In</h2>
-      <p style="margin:0 0 14px;font-size:13px;color:var(--muted);">
-        Access your restaurant stock, quick bills, and A4 menu.
-      </p>
-
-      <div class="auth-tabs">
-        <button id="modeLoginBtn" type="button" class="auth-tab active" onclick="switchAuthMode('login')">Sign In</button>
-        <button id="modeSignupBtn" type="button" class="auth-tab" onclick="switchAuthMode('signup')">Create Account</button>
+      <div class="row">
+        <div>
+          <h1>Zivo Resto</h1>
+          <div class="muted">Inventory • Quick Bill • Menu • Freemium & Pro (₹99/month)</div>
+        </div>
+        <div class="row">
+          <span class="pill" id="planBadge">Free Plan</span>
+          <button type="button" class="secondary sm" id="openUpgradeBtn">Upgrade ₹99</button>
+        </div>
       </div>
+    </div>
 
-      <form id="emailAuthForm" onsubmit="submitEmailAuth(event)">
-        <div id="usernameBox" style="display:none;">
-          <label for="usernameInput">Username</label>
-          <input id="usernameInput" type="text" placeholder="Choose a username" />
+    <!-- NAVIGATION TABS -->
+    <div class="tabs">
+      <button type="button" class="tab-btn pill active" data-tab="stock">1. Stock</button>
+      <button type="button" class="tab-btn pill" data-tab="bill">2. Quick Bill</button>
+      <button type="button" class="tab-btn pill" data-tab="menu">3. Menu</button>
+      <button type="button" class="tab-btn pill" data-tab="account">4. Account & Email</button>
+    </div>
+
+    <!-- TAB 1: STOCK (NO FAKE DATA) -->
+    <section id="tab-stock" class="card">
+      <h2>Add Stock Item</h2>
+      <form id="stockForm">
+        <div class="grid-2">
+          <div>
+            <label for="itemName">Item Name</label>
+            <input id="itemName" type="text" placeholder="e.g., Potato, Onion, Atta" required />
+          </div>
+          <div>
+            <label for="itemQty">Quantity Left</label>
+            <input id="itemQty" type="number" step="0.01" min="0" value="0" required />
+          </div>
+          <div>
+            <label for="itemUnit">Unit</label>
+            <select id="itemUnit">
+              <option value="kg">kg</option>
+              <option value="g">g</option>
+              <option value="L">L</option>
+              <option value="pcs">pcs</option>
+            </select>
+          </div>
+          <div>
+            <label for="itemWarn">Low Stock Warning At</label>
+            <input id="itemWarn" type="number" step="0.01" min="0" value="0" required />
+          </div>
         </div>
-
-        <label for="emailInput">Email</label>
-        <input id="emailInput" type="email" placeholder="restaurant@example.com" required />
-
-        <label for="passwordInput">Password</label>
-        <input id="passwordInput" type="password" minlength="6" placeholder="At least 6 characters" required />
-
-        <div class="terms-row">
-          <input id="termsCheckbox" type="checkbox" checked required />
-          <span>
-            I agree to the <button type="button" class="link-btn" onclick="openTerms()">Terms & Conditions</button> and understand this app is in early release and may contain mistakes.
-          </span>
+        <div style="margin-top: 12px;">
+          <button type="submit">Save Stock Item</button>
         </div>
-
-        <button id="emailSubmitBtn" type="submit" class="btn btn-primary btn-full">Sign In</button>
       </form>
 
-      <div class="divider">OR</div>
-
-      <button type="button" class="btn btn-outline btn-full" onclick="signInGoogle()">
-        <svg width="17" height="17" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-        Continue with Google
-      </button>
-
-      <div id="authErrorBox" class="error-box"></div>
-    </div>
-  </section>
-
-  <!-- MAIN WORKSPACE -->
-  <main id="mainApp" class="container" style="display:none;">
-    <div id="lowStockAlert" class="alert-banner">
-      <div id="lowStockSummary"></div>
-      <button type="button" class="btn btn-warn btn-sm" onclick="setLowFilter(true)">Show Low Stock Items</button>
-    </div>
-
-    <nav class="nav-bar">
-      <button type="button" class="nav-btn active" onclick="showTab('tabStock', this)">1. Stock</button>
-      <button type="button" class="nav-btn" onclick="showTab('tabBill', this)">2. Quick Bill</button>
-      <button type="button" class="nav-btn" onclick="showTab('tabMenu', this)">3. A4 Menu & QR</button>
-    </nav>
-
-    <!-- 1. STOCK -->
-    <section id="tabStock" class="panel active">
-      <div class="grid-2">
-        <div class="card">
-          <h3 style="margin-top:0;">Add Stock Item</h3>
-          <form onsubmit="addStock(event)">
-            <label for="stName">Item Name</label>
-            <input id="stName" placeholder="e.g., Potato, Onion, Atta" required />
-
-            <div class="row-2">
-              <div>
-                <label for="stQty">Quantity Left</label>
-                <input id="stQty" type="number" step="0.1" min="0" placeholder="0" required />
-              </div>
-              <div>
-                <label for="stUnit">Unit</label>
-                <select id="stUnit">
-                  <option value="kg">kg</option>
-                  <option value="g">g</option>
-                  <option value="L">L</option>
-                  <option value="pcs">pcs</option>
-                </select>
-              </div>
-            </div>
-
-            <label for="stMin">Low Stock Warning At</label>
-            <input id="stMin" type="number" step="0.1" min="0" placeholder="0" required />
-
-            <button type="submit" class="btn btn-primary btn-full">Save Stock Item</button>
-          </form>
-        </div>
-
-        <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-            <h3 style="margin:0;">Stock List</h3>
-            <div style="display:flex;gap:6px;">
-              <button type="button" class="btn btn-warn btn-sm" onclick="setLowFilter(true)">Show Low Stock Items</button>
-              <button type="button" class="btn btn-outline btn-sm" onclick="setLowFilter(false)">Show All</button>
-            </div>
-          </div>
-
-          <table>
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th>Left</th>
-                <th>Status</th>
-                <th>Adjust</th>
-              </tr>
-            </thead>
-            <tbody id="stockRows"></tbody>
-          </table>
-          <div id="stockEmptyMsg" class="empty-state">No stock items added yet.</div>
-          <div id="stockLimitText" style="margin-top:10px;font-size:12px;color:var(--muted);"></div>
+      <div class="row" style="margin-top: 20px;">
+        <h2>Stock List (<span id="stockCount">0</span>)</h2>
+        <div class="row">
+          <button type="button" class="secondary sm" id="filterLowBtn">Show Low Stock Items</button>
+          <button type="button" class="secondary sm" id="filterAllBtn">Show All</button>
         </div>
       </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Left</th>
+            <th>Status</th>
+            <th>Adjust</th>
+          </tr>
+        </thead>
+        <tbody id="stockTableBody"></tbody>
+      </table>
     </section>
 
-    <!-- 2. QUICK BILL -->
-    <section id="tabBill" class="panel">
-      <div class="grid-2">
-        <div class="card">
-          <h3 style="margin-top:0;">Create Bill</h3>
-          <label for="billDishSelect">Select From Menu</label>
-          <select id="billDishSelect" onchange="applyMenuDish()">
-            <option value="">-- Custom Item --</option>
-          </select>
-
-          <div class="row-2">
-            <div>
-              <label for="billName">Food / Item Name</label>
-              <input id="billName" placeholder="Item name" />
-            </div>
-            <div>
-              <label for="billPrice">Price (₹)</label>
-              <input id="billPrice" type="number" min="1" step="0.5" placeholder="0" />
-            </div>
+    <!-- TAB 2: QUICK BILL (FREEMIUM LIMIT ON FREE PLAN, UNLIMITED ON PRO ₹99) -->
+    <section id="tab-bill" class="card hidden">
+      <h2>Quick Bill</h2>
+      <p class="muted" id="billLimitNote">Free Plan: up to 10 saved bills. Upgrade to Zivo Pro (₹99/month) for unlimited bills.</p>
+      <form id="billForm">
+        <div class="grid-2">
+          <div>
+            <label for="billItem">Dish / Item</label>
+            <input id="billItem" type="text" placeholder="e.g., Masala Dosa" required />
           </div>
-
-          <label for="billQty">Quantity</label>
-          <input id="billQty" type="number" min="1" value="1" />
-
-          <button type="button" class="btn btn-primary btn-full" onclick="addToBill()">Add to Bill</button>
-        </div>
-
-        <div class="card printable">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <h3 style="margin:0;" id="billShopTitle">Bill</h3>
-            <button type="button" class="btn btn-outline btn-sm no-print" onclick="window.print()">Print Bill</button>
+          <div>
+            <label for="billAmount">Amount (₹)</label>
+            <input id="billAmount" type="number" min="1" step="0.01" placeholder="0" required />
           </div>
-          <div id="billMetaLine" style="font-size:12px;color:var(--muted);margin-top:4px;"></div>
-
-          <table>
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th>Qty</th>
-                <th>Price</th>
-                <th>Amount</th>
-                <th class="no-print"></th>
-              </tr>
-            </thead>
-            <tbody id="billRows"></tbody>
-          </table>
-          <div id="billEmptyMsg" class="empty-state">No bill items added yet.</div>
-
-          <h3 style="text-align:right;margin:14px 0 4px;">Total: ₹<span id="billTotalAmt">0</span></h3>
-          <div id="billNoteLine" style="font-size:11px;color:var(--muted);"></div>
         </div>
+        <div style="margin-top: 12px;">
+          <button type="submit">Add Bill Entry</button>
+        </div>
+      </form>
+
+      <div style="margin-top: 16px;">
+        <strong>Recorded Bills Total: ₹<span id="billTotal">0.00</span></strong>
       </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Amount (₹)</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody id="billsTableBody"></tbody>
+      </table>
     </section>
 
-    <!-- 3. A4 MENU & QR -->
-    <section id="tabMenu" class="panel">
-      <div class="grid-2">
-        <div class="card">
-          <h3 style="margin-top:0;">Restaurant & Menu Details</h3>
-
-          <label for="restName">Restaurant Name</label>
-          <input id="restName" placeholder="Enter restaurant name" oninput="syncRestaurantMeta()" />
-
-          <div class="row-2">
-            <div>
-              <label for="restEmail">Restaurant Email</label>
-              <input id="restEmail" type="email" placeholder="info@restaurant.com" oninput="syncRestaurantMeta()" />
-            </div>
-            <div>
-              <label for="restPhone">Restaurant Phone</label>
-              <input id="restPhone" type="tel" placeholder="+91 98765 43210" oninput="syncRestaurantMeta()" />
-            </div>
+    <!-- TAB 3: MENU -->
+    <section id="tab-menu" class="card hidden">
+      <h2>Menu Items</h2>
+      <form id="menuForm">
+        <div class="grid-2">
+          <div>
+            <label for="menuDish">Dish Name</label>
+            <input id="menuDish" type="text" placeholder="e.g., Paneer Tikka" required />
           </div>
-
-          <label for="restPromo">Offer / Ad Line (Optional)</label>
-          <input id="restPromo" placeholder="e.g., Freshly cooked • Combo offers available" oninput="syncRestaurantMeta()" />
-
-          <label for="restQrUrl">QR Link (Menu URL or UPI Link)</label>
-          <input id="restQrUrl" placeholder="https://..." oninput="renderA4Menu()" />
-
-          <label for="restLogoInput">QR Center Logo (Optional)</label>
-          <input id="restLogoInput" type="file" accept="image/*" onchange="handleLogoFile(event)" />
-
-          <hr style="border:none;border-top:1px solid var(--border);margin:16px 0;" />
-
-          <h3 style="margin:0 0 6px;">Add Food Item</h3>
-          <div class="row-2">
-            <div>
-              <label for="foodNameInput">Food Name</label>
-              <input id="foodNameInput" placeholder="e.g., Paneer Tikka" />
-            </div>
-            <div>
-              <label for="foodPriceInput">Price (₹)</label>
-              <input id="foodPriceInput" type="number" min="1" step="0.5" placeholder="0" />
-            </div>
+          <div>
+            <label for="menuPrice">Price (₹)</label>
+            <input id="menuPrice" type="number" min="0" step="0.01" placeholder="0" required />
           </div>
-          <button type="button" class="btn btn-primary btn-full" onclick="addFoodItem()">Add Food to Menu</button>
         </div>
+        <div style="margin-top: 12px;">
+          <button type="submit">Add to Menu</button>
+        </div>
+      </form>
+      <table>
+        <thead>
+          <tr>
+            <th>Dish</th>
+            <th>Price (₹)</th>
+            <th>Remove</th>
+          </tr>
+        </thead>
+        <tbody id="menuTableBody"></tbody>
+      </table>
+    </section>
 
-        <div class="card printable">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-            <h3 style="margin:0;">A4 Menu Preview</h3>
-            <button type="button" class="btn btn-outline btn-sm no-print" onclick="window.print()">Print A4 Menu</button>
+    <!-- TAB 4: ACCOUNT & PROMOTIONAL EMAIL OPT-IN -->
+    <section id="tab-account" class="card hidden">
+      <h2>Account & Email Preferences</h2>
+      <p class="muted">Syncs your profile and promotional email opt-in status with the Admin Panel.</p>
+      <form id="accountForm">
+        <div class="grid-2">
+          <div>
+            <label for="accName">Your Name / Restaurant</label>
+            <input id="accName" type="text" placeholder="Enter your name" required />
           </div>
+          <div>
+            <label for="accEmail">Email Address</label>
+            <input id="accEmail" type="email" placeholder="name@example.com" required />
+          </div>
+        </div>
+        <label class="check-row">
+          <input id="accPromoOptIn" type="checkbox" />
+          <span>I want to receive promotional emails from Zivo (can be turned off anytime)</span>
+        </label>
+        <div style="margin-top: 12px;">
+          <button type="submit">Save Preferences</button>
+        </div>
+      </form>
+      <div id="accMsg" class="notice hidden"></div>
+    </section>
 
-          <div class="a4-sheet">
-            <div>
-              <div class="a4-header">
-                <h2 id="a4RestName" style="margin:0;font-size:20px;">Restaurant Menu</h2>
-                <div class="a4-contact">
-                  <span id="a4EmailText"></span>
-                  <span id="a4PhoneText"></span>
-                </div>
-                <div id="a4PromoBox" class="a4-promo" style="display:none;"></div>
-              </div>
-
-              <table>
-                <thead>
-                  <tr>
-                    <th>Food Name</th>
-                    <th style="text-align:right;">Price</th>
-                    <th class="no-print" style="width:36px;"></th>
-                  </tr>
-                </thead>
-                <tbody id="a4FoodRows"></tbody>
-              </table>
-              <div id="a4EmptyMsg" class="empty-state">No food items added yet.</div>
-
-              <div id="a4QrBox" style="display:none;margin-top:16px;align-items:center;gap:14px;flex-wrap:wrap;">
-                <canvas id="a4QrCanvas" width="130" height="130"></canvas>
-                <div>
-                  <strong style="font-size:13px;">Scan Menu QR</strong>
-                  <div id="a4QrLinkText" style="font-size:12px;color:var(--muted);word-break:break-all;"></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="a4-footer">
-              <span id="a4PlanNote">Zivo Resto</span>
-              <span class="page-num-text">Page 1</span>
-            </div>
+    <!-- FREEMIUM VS PRO (₹99 DODO PAY) CARD -->
+    <section id="upgradeBox" class="card hidden">
+      <div class="row">
+        <h2>Free Plan vs. Zivo Pro — ₹99 / month</h2>
+        <button type="button" class="secondary sm" id="closeUpgradeBtn">Close</button>
+      </div>
+      <div class="grid-2" style="margin-top: 10px;">
+        <div style="border: 1px solid var(--border); border-radius: 12px; padding: 14px;">
+          <strong>Free Plan (₹0)</strong>
+          <p class="muted" style="margin-top:6px;">Stock tracker, menu list, and up to 10 quick bills.</p>
+        </div>
+        <div style="border: 1px solid #93c5fd; background: var(--primary-soft); border-radius: 12px; padding: 14px;">
+          <strong>Zivo Pro (₹99 / month via Dodo Payments)</strong>
+          <p class="muted" style="margin-top:6px;">Unlimited quick bills and Pro badge enabled for your account.</p>
+          <div style="margin-top: 10px;">
+            <label for="dodoCheckoutUrl" style="margin-top:0;">Dodo Payments ₹99 Checkout Link</label>
+            <input id="dodoCheckoutUrl" type="url" value="https://checkout.dodopayments.com/buy/pdt_your_99_inr_plan" />
+          </div>
+          <div class="row" style="margin-top: 12px;">
+            <a id="dodoPayLink" href="https://checkout.dodopayments.com/buy/pdt_your_99_inr_plan" target="_blank" rel="noopener noreferrer">
+              <button type="button">Pay ₹99 on Dodo Pay</button>
+            </a>
+            <button type="button" class="secondary sm" id="activateProBtn">Mark Pro Active (After Payment)</button>
           </div>
         </div>
       </div>
     </section>
-  </main>
-
-  <!-- FOOTER WITH DEVELOPER & CONTACT INFO -->
-  <footer class="app-footer">
-    <div>
-      <strong>Zivo Resto</strong> — Built in 2026 by <strong>Rishab</strong> (11 years old). Early app: mistakes or bugs may occur.
-    </div>
-    <div>
-      Help: <a href="mailto:zivo.developer@gmail.com" style="color:var(--primary);font-weight:600;text-decoration:none;">zivo.developer@gmail.com</a>
-       • 
-      <button type="button" class="link-btn" onclick="openTerms()">Terms & Conditions</button>
-    </div>
-  </footer>
-
-  <!-- TERMS & CONDITIONS MODAL -->
-  <div id="termsModal" class="modal-backdrop" onclick="closeTermsOnBackdrop(event)">
-    <div class="modal-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <h3 style="margin:0;">Terms & Conditions</h3>
-        <button type="button" class="btn btn-outline btn-sm" onclick="closeTerms()">Close</button>
-      </div>
-      <p style="font-size:13px;color:var(--muted);line-height:1.5;">
-        <strong>Zivo Resto</strong> is an independent application created in <strong>2026</strong> by <strong>Rishab</strong> (11 years old).
-      </p>
-      <ul style="font-size:13px;color:var(--text);line-height:1.6;padding-left:18px;">
-        <li>This app is provided as-is. Because it is actively developed, mistakes, calculation differences, or technical issues can happen. Always double-check stock counts, prices, and bills.</li>
-        <li>You are responsible for the accuracy of the restaurant details, menu prices, inventory entries, and QR links you enter.</li>
-        <li>Your account data is stored under your signed-in account. Please do not enter sensitive passwords or bank PINs into menus or notes.</li>
-        <li>For help, feedback, or bug reports, contact <strong>zivo.developer@gmail.com</strong>.</li>
-      </ul>
-    </div>
   </div>
 
-  <!-- SINGLE-FILE PWA SETUP (SYMBOL ICON, NO GLOBE) -->
   <script>
-    (function initPwa() {
-      const symbolSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="36" fill="#0f52ba"/><path d="M46 58h100L46 134h100" fill="none" stroke="#ffffff" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-      const symbolDataUrl = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(symbolSvg);
-
-      const manifest = {
-        name: "Zivo Resto",
-        short_name: "Zivo Resto",
-        start_url: location.href,
-        display: "standalone",
-        background_color: "#f4f6f9",
-        theme_color: "#0f52ba",
-        icons: [
-          {
-            src: symbolDataUrl,
-            sizes: "192x192",
-            type: "image/svg+xml",
-            purpose: "any"
-          }
-        ]
-      };
-
-      const manifestBlob = new Blob([JSON.stringify(manifest)], { type: "application/manifest+json" });
-      const manifestEl = document.createElement("link");
-      manifestEl.rel = "manifest";
-      manifestEl.href = URL.createObjectURL(manifestBlob);
-      document.head.appendChild(manifestEl);
-
-      if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
-        const swScript = `
-          const CACHE = "zivo-resto-cache-v2";
-          self.addEventListener("install", (e) => {
-            e.waitUntil(caches.open(CACHE).then((c) => c.addAll(["./"])));
-            self.skipWaiting();
-          });
-          self.addEventListener("activate", (e) => {
-            e.waitUntil(self.clients.claim());
-          });
-          self.addEventListener("fetch", (e) => {
-            if (e.request.method !== "GET") return;
-            e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
-          });
-        `;
-        const swBlob = new Blob([swScript], { type: "application/javascript" });
-        navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
-      }
-
-      let deferredPrompt = null;
-      const installBtn = document.getElementById("installBtn");
-      const installHint = document.getElementById("installHint");
-
-      const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
-      if (isStandalone && installHint) {
-        installHint.textContent = "App Installed";
-      }
-
-      window.addEventListener("beforeinstallprompt", (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        if (installBtn) installBtn.style.display = "inline-flex";
-        if (installHint) installHint.textContent = "";
-      });
-
-      window.installApp = async () => {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        await deferredPrompt.userChoice;
-        deferredPrompt = null;
-        if (installBtn) installBtn.style.display = "none";
-      };
-
-      window.addEventListener("appinstalled", () => {
-        deferredPrompt = null;
-        if (installBtn) installBtn.style.display = "none";
-        if (installHint) installHint.textContent = "App Installed";
-      });
-    })();
-  </script>
-
-  <!-- FIREBASE & APP LOGIC -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import {
-      getAuth,
-      onAuthStateChanged,
-      signInWithEmailAndPassword,
-      createUserWithEmailAndPassword,
-      updateProfile,
-      GoogleAuthProvider,
-      signInWithPopup,
-      signInWithRedirect,
-      getRedirectResult,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-    import {
-      getFirestore,
-      doc,
-      getDoc,
-      setDoc,
-      collection,
-      addDoc,
-      updateDoc,
-      deleteDoc,
-      onSnapshot
-    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-
-    // Silent OS detection for styling (no OS label shown in top-left)
-    (function applyOsClass() {
-      const ua = navigator.userAgent || "";
-      const platform = navigator.userAgentData?.platform || navigator.platform || "";
-      if (/Android|iPhone|iPad|iPod/i.test(ua)) {
-        document.body.classList.add("os-android");
-      } else if (/Win|Windows|Mac/i.test(platform) || /Win|Windows|Mac/i.test(ua)) {
-        document.body.classList.add("os-windows");
-      }
-    })();
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDrU8dcQNzp-U0LDXD_dyza7zDIYEnbJJ0",
-      authDomain: "zivo-3f8d7.firebaseapp.com",
-      projectId: "zivo-3f8d7",
-      storageBucket: "zivo-3f8d7.firebasestorage.app",
-      messagingSenderId: "245798482497",
-      appId: "1:245798482497:web:2b56a68910b6e9e8060cc0",
-      measurementId: "G-3TG2V9GD1V"
+    const KEYS = {
+      apps: "zivo_eco_apps_v1",
+      users: "zivo_eco_users_v1",
+      gaId: "zivo_eco_ga_id_v1",
+      stock: "zivo_resto_stock_v1",
+      bills: "zivo_resto_bills_v1",
+      menu: "zivo_resto_menu_v1",
+      currentUser: "zivo_resto_current_user_v1"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    const $ = (id) => document.getElementById(id);
 
-    const FREE_LIMIT = 5;
-    let authMode = "login";
-    let currentUser = null;
-    let planTier = "free";
-    let stockItems = [];
-    let menuItems = [];
-    let billLines = [];
-    let onlyLowFilter = false;
-    let centerLogo = null;
-    let stopStockListener = null;
-    let stopMenuListener = null;
-
-    window.openTerms = () => {
-      document.getElementById("termsModal").style.display = "flex";
-    };
-    window.closeTerms = () => {
-      document.getElementById("termsModal").style.display = "none";
-    };
-    window.closeTermsOnBackdrop = (e) => {
-      if (e.target.id === "termsModal") closeTerms();
-    };
-
-    function showError(msg) {
-      const el = document.getElementById("authErrorBox");
-      el.textContent = msg;
-      el.style.display = "block";
-    }
-
-    function clearError() {
-      const el = document.getElementById("authErrorBox");
-      el.textContent = "";
-      el.style.display = "none";
-    }
-
-    function formatAuthError(err) {
-      const code = err?.code || "";
-      if (code === "auth/unauthorized-domain") {
-        return "This domain is not authorized in Firebase yet. Add your site domain under Firebase Console -> Authentication -> Settings -> Authorized domains.";
-      }
-      if (code === "auth/invalid-credential" || code === "auth/wrong-password" || code === "auth/user-not-found") {
-        return "Invalid email or password.";
-      }
-      if (code === "auth/email-already-in-use") {
-        return "An account with this email already exists. Try signing in instead.";
-      }
-      return (err?.message || "Could not sign in.").replace("Firebase:", "").trim();
-    }
-
-    window.switchAuthMode = (mode) => {
-      authMode = mode;
-      clearError();
-      document.getElementById("modeLoginBtn").classList.toggle("active", mode === "login");
-      document.getElementById("modeSignupBtn").classList.toggle("active", mode === "signup");
-      document.getElementById("usernameBox").style.display = mode === "signup" ? "block" : "none";
-      document.getElementById("usernameInput").required = mode === "signup";
-      document.getElementById("emailSubmitBtn").textContent = mode === "login" ? "Sign In" : "Create Account";
-    };
-
-    window.submitEmailAuth = async (e) => {
-      e.preventDefault();
-      clearError();
-      if (!document.getElementById("termsCheckbox").checked) {
-        showError("Please accept the Terms & Conditions to continue.");
-        return;
-      }
-
-      const email = document.getElementById("emailInput").value.trim();
-      const password = document.getElementById("passwordInput").value;
-      const username = document.getElementById("usernameInput").value.trim();
-
+    function readList(key) {
       try {
-        if (authMode === "signup") {
-          const cred = await createUserWithEmailAndPassword(auth, email, password);
-          await updateProfile(cred.user, { displayName: username });
-          await setDoc(doc(db, "users", cred.user.uid), {
-            username,
-            email,
-            plan: "free",
-            restaurantName: "",
-            restaurantEmail: "",
-            restaurantPhone: "",
-            promoLine: ""
-          });
-        } else {
-          await signInWithEmailAndPassword(auth, email, password);
-        }
-      } catch (err) {
-        showError(formatAuthError(err));
+        const v = JSON.parse(localStorage.getItem(key));
+        return Array.isArray(v) ? v : [];
+      } catch {
+        return [];
       }
-    };
+    }
 
-    window.signInGoogle = async () => {
-      clearError();
-      if (!document.getElementById("termsCheckbox").checked) {
-        showError("Please accept the Terms & Conditions to continue.");
-        return;
-      }
+    function writeList(key, v) {
+      localStorage.setItem(key, JSON.stringify(v));
+    }
 
+    function getCurrentUser() {
       try {
-        const provider = new GoogleAuthProvider();
-        const res = await signInWithPopup(auth, provider);
-        await ensureUserDoc(res.user);
-      } catch (err) {
-        if (err?.code === "auth/popup-blocked") {
-          try {
-            await signInWithRedirect(auth, new GoogleAuthProvider());
-            return;
-          } catch (redirErr) {
-            showError(formatAuthError(redirErr));
-            return;
-          }
-        }
-        showError(formatAuthError(err));
+        return JSON.parse(localStorage.getItem(KEYS.currentUser)) || {
+          name: "",
+          email: "",
+          promoOptIn: false,
+          plan: "free"
+        };
+      } catch {
+        return { name: "", email: "", promoOptIn: false, plan: "free" };
       }
-    };
+    }
 
-    async function ensureUserDoc(user) {
-      const ref = doc(db, "users", user.uid);
-      const snap = await getDoc(ref);
-      if (!snap.exists()) {
-        await setDoc(ref, {
-          username: user.displayName || user.email.split("@")[0],
+    function saveCurrentUser(user) {
+      localStorage.setItem(KEYS.currentUser, JSON.stringify(user));
+      if (user.email) {
+        const users = readList(KEYS.users);
+        const idx = users.findIndex((u) => u.email === user.email);
+        const record = {
+          name: user.name,
           email: user.email,
-          plan: "free",
-          restaurantName: "",
-          restaurantEmail: user.email || "",
-          restaurantPhone: "",
-          promoLine: ""
-        });
+          appName: "Zivo Resto",
+          plan: user.plan || "free",
+          promoOptIn: Boolean(user.promoOptIn)
+        };
+        if (idx >= 0) users[idx] = record;
+        else users.push(record);
+        writeList(KEYS.users, users);
       }
     }
 
-    getRedirectResult(auth).then(async (res) => {
-      if (res?.user) {
-        await ensureUserDoc(res.user);
-      }
-    }).catch((err) => {
-      if (err?.code) showError(formatAuthError(err));
+    // Load GA4 if configured in Admin Panel
+    const gaMeasurementId = localStorage.getItem(KEYS.gaId);
+    if (gaMeasurementId) {
+      const s = document.createElement("script");
+      s.async = true;
+      s.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(gaMeasurementId)}`;
+      document.head.appendChild(s);
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){ window.dataLayer.push(arguments); }
+      gtag("js", new Date());
+      gtag("config", gaMeasurementId);
+    }
+
+    // Tabs
+    document.querySelectorAll(".tab-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        const target = btn.dataset.tab;
+        ["stock", "bill", "menu", "account"].forEach((t) => {
+          $("tab-" + t).classList.toggle("hidden", t !== target);
+        });
+      });
     });
 
-    window.signOutAccount = async () => {
-      if (stopStockListener) stopStockListener();
-      if (stopMenuListener) stopMenuListener();
-      await signOut(auth);
-    };
-
-    onAuthStateChanged(auth, async (user) => {
-      currentUser = user;
-      if (!user) {
-        document.getElementById("authView").style.display = "block";
-        document.getElementById("mainApp").style.display = "none";
-        document.getElementById("userHeaderGroup").style.display = "none";
-        return;
-      }
-
-      document.getElementById("authView").style.display = "none";
-      document.getElementById("mainApp").style.display = "block";
-      document.getElementById("userHeaderGroup").style.display = "flex";
-
-      await ensureUserDoc(user);
-      const snap = await getDoc(doc(db, "users", user.uid));
-      const data = snap.exists() ? snap.data() : {};
-      planTier = data.plan || "free";
-
-      document.getElementById("userNameTag").textContent = user.displayName || data.username || user.email;
-      document.getElementById("planTag").textContent = planTier === "pro" ? "Pro Plan" : "Free Plan";
-      document.getElementById("restName").value = data.restaurantName || "";
-      document.getElementById("restEmail").value = data.restaurantEmail || "";
-      document.getElementById("restPhone").value = data.restaurantPhone || "";
-      document.getElementById("restPromo").value = data.promoLine || "";
-
-      if (stopStockListener) stopStockListener();
-      if (stopMenuListener) stopMenuListener();
-
-      stopStockListener = onSnapshot(collection(db, "users", user.uid, "stock"), (qs) => {
-        stockItems = qs.docs.map((d) => ({ id: d.id, ...d.data() }));
-        renderStock();
-      });
-
-      stopMenuListener = onSnapshot(collection(db, "users", user.uid, "menu"), (qs) => {
-        menuItems = qs.docs.map((d) => ({ id: d.id, ...d.data() }));
-        renderBillPicker();
-        renderA4Menu();
-      });
-
-      syncRestaurantMeta(false);
-      renderBill();
+    // Upgrade panel
+    $("openUpgradeBtn").addEventListener("click", () => $("upgradeBox").classList.remove("hidden"));
+    $("closeUpgradeBtn").addEventListener("click", () => $("upgradeBox").classList.add("hidden"));
+    $("dodoCheckoutUrl").addEventListener("input", (e) => {
+      $("dodoPayLink").href = e.target.value.trim() || "#";
+    });
+    $("activateProBtn").addEventListener("click", () => {
+      const user = getCurrentUser();
+      user.plan = "pro";
+      saveCurrentUser(user);
+      renderPlan();
+      $("upgradeBox").classList.add("hidden");
     });
 
-    window.showTab = (tabId, btn) => {
-      document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
-      document.querySelectorAll(".nav-btn").forEach((b) => b.classList.remove("active"));
-      document.getElementById(tabId).classList.add("active");
-      btn.classList.add("active");
-    };
+    function renderPlan() {
+      const user = getCurrentUser();
+      const isPro = user.plan === "pro";
+      $("planBadge").textContent = isPro ? "Pro Plan (₹99)" : "Free Plan";
+      $("billLimitNote").textContent = isPro
+        ? "Zivo Pro active: unlimited quick bills enabled."
+        : "Free Plan: up to 10 saved bills. Upgrade to Zivo Pro (₹99/month) for unlimited bills.";
+    }
 
-    // STOCK
-    window.addStock = async (e) => {
+    // Stock logic
+    let lowOnly = false;
+    $("stockForm").addEventListener("submit", (e) => {
       e.preventDefault();
-      if (!currentUser) return;
-      if (planTier !== "pro" && stockItems.length >= FREE_LIMIT) {
-        alert(`Free plan allows up to ${FREE_LIMIT} stock items.`);
-        return;
-      }
-
-      const name = document.getElementById("stName").value.trim();
-      const qty = parseFloat(document.getElementById("stQty").value);
-      const unit = document.getElementById("stUnit").value;
-      const min = parseFloat(document.getElementById("stMin").value);
-
-      await addDoc(collection(db, "users", currentUser.uid, "stock"), { name, qty, unit, min });
-      e.target.reset();
-    };
-
-    window.adjustStock = async (id, delta) => {
-      const item = stockItems.find((s) => s.id === id);
-      if (!item || !currentUser) return;
-      const next = Math.max(0, +(item.qty + delta).toFixed(2));
-      await updateDoc(doc(db, "users", currentUser.uid, "stock", id), { qty: next });
-    };
-
-    window.deleteStock = async (id) => {
-      if (!currentUser) return;
-      await deleteDoc(doc(db, "users", currentUser.uid, "stock", id));
-    };
-
-    window.setLowFilter = (val) => {
-      onlyLowFilter = val;
+      const stock = readList(KEYS.stock);
+      stock.push({
+        id: "st_" + Date.now(),
+        name: $("itemName").value.trim(),
+        qty: Number($("itemQty").value),
+        unit: $("itemUnit").value,
+        warnAt: Number($("itemWarn").value)
+      });
+      writeList(KEYS.stock, stock);
+      $("stockForm").reset();
+      $("itemQty").value = "0";
+      $("itemWarn").value = "0";
       renderStock();
-    };
+    });
+
+    $("filterLowBtn").addEventListener("click", () => { lowOnly = true; renderStock(); });
+    $("filterAllBtn").addEventListener("click", () => { lowOnly = false; renderStock(); });
+
+    function adjustStock(id, delta) {
+      const stock = readList(KEYS.stock).map((item) => {
+        if (item.id !== id) return item;
+        const nextQty = Math.max(0, Number((item.qty + delta).toFixed(2)));
+        return { ...item, qty: nextQty };
+      });
+      writeList(KEYS.stock, stock);
+      renderStock();
+    }
 
     function renderStock() {
-      const lowList = stockItems.filter((s) => s.qty <= s.min);
-      const banner = document.getElementById("lowStockAlert");
-
-      if (lowList.length > 0) {
-        banner.style.display = "flex";
-        const first = lowList[0];
-        document.getElementById("lowStockSummary").innerHTML =
-          `<strong>Low Stock Warning:</strong> ${first.qty} ${first.unit} of ${first.name} left (${lowList.length} low/finished item${lowList.length > 1 ? "s" : ""}).`;
-      } else {
-        banner.style.display = "none";
-      }
-
-      const list = onlyLowFilter ? lowList : stockItems;
-      const tbody = document.getElementById("stockRows");
-      tbody.innerHTML = "";
-      document.getElementById("stockEmptyMsg").style.display = list.length === 0 ? "block" : "none";
-
-      list.forEach((item) => {
-        let statusBadge = `<span class="badge badge-ok">OK</span>`;
-        if (item.qty <= 0) statusBadge = `<span class="badge badge-out">Finished</span>`;
-        else if (item.qty <= item.min) statusBadge = `<span class="badge badge-low">${item.qty} ${item.unit} left</span>`;
-
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td><strong>${item.name}</strong></td>
-          <td>${item.qty} ${item.unit}</td>
-          <td>${statusBadge}</td>
-          <td>
-            <button type="button" class="btn btn-outline btn-sm" onclick="adjustStock('${item.id}', -1)">-1</button>
-            <button type="button" class="btn btn-outline btn-sm" onclick="adjustStock('${item.id}', 1)">+1</button>
-            <button type="button" class="btn btn-danger btn-sm" onclick="deleteStock('${item.id}')">×</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      document.getElementById("stockLimitText").textContent =
-        planTier === "pro" ? "Pro Plan: Unlimited stock items" : `Free Plan: ${stockItems.length}/${FREE_LIMIT} stock items`;
+      const stock = readList(KEYS.stock);
+      $("stockCount").textContent = String(stock.length);
+      const list = lowOnly ? stock.filter((i) => i.qty <= i.warnAt) : stock;
+      const body = $("stockTableBody");
+      body.innerHTML = list.length
+        ? list.map((i) => {
+            const isLow = i.qty <= i.warnAt;
+            return `
+              <tr>
+                <td>${esc(i.name)}</td>
+                <td>${i.qty} ${esc(i.unit)}</td>
+                <td style="color:${isLow ? "var(--warn)" : "var(--ok)"}; font-weight:600;">
+                  ${isLow ? "Low Stock" : "OK"}
+                </td>
+                <td>
+                  <button type="button" class="secondary sm" onclick="adjustStock('${i.id}', -1)">-1</button>
+                  <button type="button" class="secondary sm" onclick="adjustStock('${i.id}', 1)">+1</button>
+                </td>
+              </tr>
+            `;
+          }).join("")
+        : `<tr><td colspan="4" class="muted">No stock items recorded yet.</td></tr>`;
     }
 
-    // BILLING
-    function renderBillPicker() {
-      const sel = document.getElementById("billDishSelect");
-      sel.innerHTML = `<option value="">-- Custom Item --</option>` +
-        menuItems.map((m) => `<option value="${m.id}">${m.name} (₹${m.price})</option>`).join("");
-    }
-
-    window.applyMenuDish = () => {
-      const id = document.getElementById("billDishSelect").value;
-      const dish = menuItems.find((m) => m.id === id);
-      if (dish) {
-        document.getElementById("billName").value = dish.name;
-        document.getElementById("billPrice").value = dish.price;
-      }
-    };
-
-    window.addToBill = () => {
-      const name = document.getElementById("billName").value.trim();
-      const price = parseFloat(document.getElementById("billPrice").value);
-      const qty = parseInt(document.getElementById("billQty").value, 10) || 1;
-      if (!name || isNaN(price) || price <= 0) return;
-
-      billLines.push({ name, price, qty });
-      document.getElementById("billName").value = "";
-      document.getElementById("billPrice").value = "";
-      document.getElementById("billQty").value = "1";
-      document.getElementById("billDishSelect").value = "";
-      renderBill();
-    };
-
-    window.removeBillLine = (idx) => {
-      billLines.splice(idx, 1);
-      renderBill();
-    };
-
-    function renderBill() {
-      const restName = document.getElementById("restName").value.trim();
-      document.getElementById("billShopTitle").textContent = restName || "Bill";
-      document.getElementById("billMetaLine").textContent = new Date().toLocaleString("en-IN");
-
-      const tbody = document.getElementById("billRows");
-      tbody.innerHTML = "";
-      document.getElementById("billEmptyMsg").style.display = billLines.length === 0 ? "block" : "none";
-
-      let total = 0;
-      billLines.forEach((line, idx) => {
-        const amt = line.price * line.qty;
-        total += amt;
-        tbody.innerHTML += `
-          <tr>
-            <td>${line.name}</td>
-            <td>${line.qty}</td>
-            <td>₹${line.price}</td>
-            <td>₹${amt}</td>
-            <td class="no-print"><button type="button" class="btn btn-danger btn-sm" onclick="removeBillLine(${idx})">×</button></td>
-          </tr>
-        `;
-      });
-
-      document.getElementById("billTotalAmt").textContent = total;
-      document.getElementById("billNoteLine").textContent =
-        planTier === "pro" ? "" : "Zivo Resto";
-    }
-
-    // RESTAURANT & A4 MENU
-    window.syncRestaurantMeta = async (persist = true) => {
-      renderA4Menu();
-      renderBill();
-      if (!persist || !currentUser) return;
-
-      await setDoc(doc(db, "users", currentUser.uid), {
-        restaurantName: document.getElementById("restName").value.trim(),
-        restaurantEmail: document.getElementById("restEmail").value.trim(),
-        restaurantPhone: document.getElementById("restPhone").value.trim(),
-        promoLine: document.getElementById("restPromo").value.trim()
-      }, { merge: true });
-    };
-
-    window.addFoodItem = async () => {
-      if (!currentUser) return;
-      if (planTier !== "pro" && menuItems.length >= FREE_LIMIT) {
-        alert(`Free plan allows up to ${FREE_LIMIT} food items.`);
+    // Bills logic
+    $("billForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const user = getCurrentUser();
+      const bills = readList(KEYS.bills);
+      if (user.plan !== "pro" && bills.length >= 10) {
+        $("upgradeBox").classList.remove("hidden");
         return;
       }
+      bills.push({
+        id: "bl_" + Date.now(),
+        item: $("billItem").value.trim(),
+        amount: Number($("billAmount").value)
+      });
+      writeList(KEYS.bills, bills);
+      $("billForm").reset();
+      renderBills();
+    });
 
-      const name = document.getElementById("foodNameInput").value.trim();
-      const price = parseFloat(document.getElementById("foodPriceInput").value);
-      if (!name || isNaN(price) || price <= 0) return;
-
-      await addDoc(collection(db, "users", currentUser.uid, "menu"), { name, price });
-      document.getElementById("foodNameInput").value = "";
-      document.getElementById("foodPriceInput").value = "";
-    };
-
-    window.deleteFoodItem = async (id) => {
-      if (!currentUser) return;
-      await deleteDoc(doc(db, "users", currentUser.uid, "menu", id));
-    };
-
-    window.handleLogoFile = (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        const img = new Image();
-        img.onload = () => {
-          centerLogo = img;
-          renderA4Menu();
-        };
-        img.src = reader.result;
-      };
-      reader.readAsDataURL(file);
-    };
-
-    async function renderA4Menu() {
-      const name = document.getElementById("restName").value.trim() || "Restaurant Menu";
-      const email = document.getElementById("restEmail").value.trim();
-      const phone = document.getElementById("restPhone").value.trim();
-      const promo = document.getElementById("restPromo").value.trim();
-      const qrUrl = document.getElementById("restQrUrl").value.trim();
-
-      document.getElementById("a4RestName").textContent = name;
-      document.getElementById("a4EmailText").textContent = email ? `Email: ${email}` : "";
-      document.getElementById("a4PhoneText").textContent = phone ? `Phone: ${phone}` : "";
-
-      const promoBox = document.getElementById("a4PromoBox");
-      if (promo) {
-        promoBox.textContent = promo;
-        promoBox.style.display = "block";
-      } else {
-        promoBox.style.display = "none";
-      }
-
-      const tbody = document.getElementById("a4FoodRows");
-      tbody.innerHTML = menuItems.map((m) => `
-        <tr>
-          <td>${m.name}</td>
-          <td style="text-align:right;font-weight:600;">₹${m.price}</td>
-          <td class="no-print"><button type="button" class="btn btn-danger btn-sm" onclick="deleteFoodItem('${m.id}')">×</button></td>
-        </tr>
-      `).join("");
-      document.getElementById("a4EmptyMsg").style.display = menuItems.length === 0 ? "block" : "none";
-
-      const qrBox = document.getElementById("a4QrBox");
-      if (qrUrl && window.QRCode) {
-        qrBox.style.display = "flex";
-        document.getElementById("a4QrLinkText").textContent = qrUrl;
-        const canvas = document.getElementById("a4QrCanvas");
-        await window.QRCode.toCanvas(canvas, qrUrl, {
-          width: 130,
-          margin: 1,
-          errorCorrectionLevel: "H"
-        });
-        if (centerLogo) {
-          const ctx = canvas.getContext("2d");
-          const size = 32;
-          const pos = (canvas.width - size) / 2;
-          ctx.fillStyle = "#ffffff";
-          ctx.fillRect(pos - 2, pos - 2, size + 4, size + 4);
-          ctx.drawImage(centerLogo, pos, pos, size, size);
-        }
-      } else {
-        qrBox.style.display = "none";
-      }
-
-      document.getElementById("a4PlanNote").textContent =
-        planTier === "pro" ? name : `${name} • Free Plan (${menuItems.length}/${FREE_LIMIT} items)`;
+    function deleteBill(id) {
+      writeList(KEYS.bills, readList(KEYS.bills).filter((b) => b.id !== id));
+      renderBills();
     }
+
+    function renderBills() {
+      const bills = readList(KEYS.bills);
+      const total = bills.reduce((sum, b) => sum + Number(b.amount || 0), 0);
+      $("billTotal").textContent = total.toFixed(2);
+      const body = $("billsTableBody");
+      body.innerHTML = bills.length
+        ? bills.map((b) => `
+            <tr>
+              <td>${esc(b.item)}</td>
+              <td>₹${Number(b.amount).toFixed(2)}</td>
+              <td><button type="button" class="secondary sm" onclick="deleteBill('${b.id}')">Remove</button></td>
+            </tr>
+          `).join("")
+        : `<tr><td colspan="3" class="muted">No bills added yet.</td></tr>`;
+    }
+
+    // Menu logic
+    $("menuForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const menu = readList(KEYS.menu);
+      menu.push({
+        id: "mn_" + Date.now(),
+        dish: $("menuDish").value.trim(),
+        price: Number($("menuPrice").value)
+      });
+      writeList(KEYS.menu, menu);
+      $("menuForm").reset();
+      renderMenu();
+    });
+
+    function deleteMenuItem(id) {
+      writeList(KEYS.menu, readList(KEYS.menu).filter((m) => m.id !== id));
+      renderMenu();
+    }
+
+    function renderMenu() {
+      const menu = readList(KEYS.menu);
+      const body = $("menuTableBody");
+      body.innerHTML = menu.length
+        ? menu.map((m) => `
+            <tr>
+              <td>${esc(m.dish)}</td>
+              <td>₹${Number(m.price).toFixed(2)}</td>
+              <td><button type="button" class="secondary sm" onclick="deleteMenuItem('${m.id}')">Remove</button></td>
+            </tr>
+          `).join("")
+        : `<tr><td colspan="3" class="muted">No menu items added yet.</td></tr>`;
+    }
+
+    // Account & Email Opt-In
+    const initUser = getCurrentUser();
+    $("accName").value = initUser.name || "";
+    $("accEmail").value = initUser.email || "";
+    $("accPromoOptIn").checked = Boolean(initUser.promoOptIn);
+
+    $("accountForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const current = getCurrentUser();
+      const updated = {
+        ...current,
+        name: $("accName").value.trim(),
+        email: $("accEmail").value.trim(),
+        promoOptIn: $("accPromoOptIn").checked
+      };
+      saveCurrentUser(updated);
+      $("accMsg").textContent = "Saved preferences.";
+      $("accMsg").classList.remove("hidden");
+    });
+
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, (c) => ({
+        "&": "&", "<": "<", ">": ">", '"': """, "'": "'"
+      }[c]));
+    }
+
+    renderPlan();
+    renderStock();
+    renderBills();
+    renderMenu();
   </script>
 </body>
 </html>
